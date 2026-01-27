@@ -12,3 +12,18 @@ __pycache__/
 env/
 venv/
 ENV/
+
+# pip-tools generated files
+requirements/*.txt
+
+# Google Ads OAuth desktop client secret
+auth/oauth2_desktop_client.json
+
+# dbt artifacts
+dbt/target/
+dbt/logs/
+dbt/dbt_packages/
+dbt/user.yml
+dbt/.user.yml
+.dbt/user.yml
+.dbt/.user.yml
