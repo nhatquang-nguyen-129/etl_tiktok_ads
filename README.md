@@ -1,6 +1,6 @@
-# TIKTOK ADS PIPELINE
-
-KidsPlaza TikTok Ads Pipeline powers the **Digital Advertising Data Analysis** process at KidsPlaza by automating the ingestion, standardization, and loading of TikTok Ads data into the centralized analytics warehouse (**Google BigQuery**).
+<p align="left">
+  <img src="kidsplaza.png" alt="KidsPlaza Logo" width="300"/>
+</p>
 
 This pipeline integrates **TikTok Ads Insights data**, supporting both **daily synchronization** and **historical backfills**, and serves as the foundation for performance analysis, budget reconciliation, and marketing reporting.
 
