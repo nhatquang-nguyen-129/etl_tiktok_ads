@@ -1,0 +1,23 @@
+name: pipeline_tiktok_ads
+version: "1.0"
+config-version: 2
+
+profile: pipeline_tiktok_ads
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+
+models:
+  pipeline_tiktok_ads:
+    stg:
+      +materialized: ephemeral
+    int:
+      +materialized: ephemeral
+    mart:
+      +materialized: table
+      +tags: ["mart"]
+
+vars:
+  company: "{{ env_var('COMPANY') }}"
+  department: "{{ env_var('DEPARTMENT') }}"
+  account: "{{ env_var('ACCOUNT') }}"

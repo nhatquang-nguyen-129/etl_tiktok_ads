@@ -1,0 +1,10 @@
+pipeline_tiktok_ads:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth
+      project: seer-digital-ads
+      dataset: "{{ env_var('COMPANY') }}_dataset_tiktok_api_mart"
+      location: asia-southeast1
+      threads: 2
