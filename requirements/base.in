@@ -1,0 +1,19 @@
+# Python ultilities
+pytz
+requests
+
+# Python libraries
+numpy
+pandas
+pyarrow
+
+# Facebook Ads
+facebook-business
+
+# Google Cloud
+google-auth
+google-api-core
+google-cloud-bigquery
+google-cloud-bigquery-storage
+google-cloud-secret-manager
+pandas-gbq
