@@ -109,7 +109,7 @@ def extract_campaign_insights(
                         f"{end_date} due to expired or invalid access token then manual token refresh is required."
                     )
 
-        # Unexpected retryable error
+        # Unexpected retryable API error
                 if code in {
                     40102, 
                     50000, 
@@ -125,7 +125,7 @@ def extract_campaign_insights(
                         f"{code} then this request is eligible to retry."
                     )
 
-        # Unexpected non-retryable error
+        # Unexpected non-retryable API error
                 retryable = False
                 raise RuntimeError(
                     "❌ [EXTRACT] Failed to extract TikTok Ads campaign insights for advertiser_id "
