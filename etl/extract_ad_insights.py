@@ -167,8 +167,7 @@ def extract_ad_insights(
             "⚠️ [EXTRACT] Failed to extract TikTok Ads ad insights for advertiser_id "
             f"{advertiser_id} from "
             f"{start_date} to "
-            f"{end_date} due to request timeout error "
-            "then this request is eligible to retry."
+            f"{end_date} due to request timeout error then this request is eligible to retry."
         ) from e
 
     # Unexpected retryable request connection error
@@ -178,8 +177,7 @@ def extract_ad_insights(
             "⚠️ [EXTRACT] Failed to extract TikTok Ads ad insights for advertiser_id "
             f"{advertiser_id} from "
             f"{start_date} to "
-            f"{end_date} due to connection error "
-            "then this request is eligible to retry."
+            f"{end_date} due to request connection error then this request is eligible to retry."
         ) from e
 
     except requests.exceptions.HTTPError as e:
@@ -192,7 +190,8 @@ def extract_ad_insights(
                 "⚠️ [EXTRACT] Failed to extract TikTok Ads ad insights for advertiser_id "
                 f"{advertiser_id} from "
                 f"{start_date} to "
-                f"{end_date} due to HTTP request status "
+                f"{end_date} due to "
+                f"{e} with HTTP request status "
                 f"{status} then this request is eligible to retry."
             ) from e
 
@@ -202,7 +201,8 @@ def extract_ad_insights(
             "❌ [EXTRACT] Failed to extract TikTok Ads ad insights for advertiser_id "
             f"{advertiser_id} from "
             f"{start_date} to "
-            f"{end_date} due to HTTP request status "
+            f"{end_date} due to "
+            f"{e} with HTTP request status "
             f"{status} then this request is not eligible to retry."
         ) from e
 
