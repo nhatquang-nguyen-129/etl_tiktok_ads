@@ -14,7 +14,7 @@ def load_ad_metadata(
     direction: str,
 ) -> None:
     """
-    Load Google Ads ad metadata
+    Load TikTok Ads ad metadata
     ----------------------
     Workflow:
         1. Validate input DataFrame
@@ -28,14 +28,14 @@ def load_ad_metadata(
     """      
 
     if df.empty:
-        msg = ("⚠️ [LOADER] Empty Google Ads campaign metadata Dataframe then loading will be suspended.")
+        msg = ("⚠️ [LOADER] Empty TikTok Ads ad metadata Dataframe then loading will be suspended.")
         print(msg)
         logging.warning(msg)
         return
 
     msg = (
         "🔄 [LOADER] Triggering to load "
-        f"{len(df)} row(s) of Google Ads campaign metadata to Google BigQuery table "
+        f"{len(df)} row(s) of TikTok Ads ad metadata to Google BigQuery table "
         f"{direction}..."
         )
     
@@ -47,10 +47,10 @@ def load_ad_metadata(
         mode="upsert",
         keys=[
             "advertiser_id", 
-            "campaign_id"
+            "ad_id"
         ],
         partition=None,
         cluster=[
-            "campaign_id"
+            "ad_id"
         ],
     )
