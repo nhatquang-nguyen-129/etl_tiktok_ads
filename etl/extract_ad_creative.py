@@ -78,7 +78,7 @@ def extract_ad_creative(
                         f"{advertiser_id} due to expired or invalid access token then manual token refresh is required."
                     )
 
-        # Unexpected retryable error
+        # Unexpected retryable API error
                 if code in {
                     40102, 
                     50000, 
@@ -86,17 +86,17 @@ def extract_ad_creative(
                 }:
                     raise RuntimeError(
                         "⚠️ [EXTRACT] Failed to extract TikTok Ads ad creative for advertiser_id "
-                        f"{advertiser_id} due to "
-                        f"{message} with API error code "
-                        f"{code} then this API call is eligible to retry."
+                        f"{advertiser_id} due to API error "
+                        f"{message} with error code "
+                        f"{code} then this request is eligible to retry."
                     )
 
-        # Unexpected non-retryable error
+        # Unexpected non-retryable API error
                 raise RuntimeError(
                     "❌ [EXTRACT] Failed to extract TikTok Ads ad creative for advertiser_id "
-                    f"{advertiser_id} due to "
-                    f"{message} with API error code "                    
-                    f"{code} then this API call is not eligible to retry."
+                    f"{advertiser_id} due to API error "
+                    f"{message} with error code "                    
+                    f"{code} then this request is not eligible to retry."
                 )
 
             video_list = data.get("data", {}).get("list", [])
@@ -135,7 +135,7 @@ def extract_ad_creative(
                 "⚠️ [EXTRACT] Failed to extract TikTok Ads ad creative for advertiser_id "
                 f"{advertiser_id} due to "
                 f"{e} with HTTP request status "
-                f"{status} then this API call is eligible to retry."
+                f"{status} then this request is eligible to retry."
             ) from e
 
         # Unexpected non-retryable HTTP request error
@@ -143,7 +143,7 @@ def extract_ad_creative(
                 "❌ [EXTRACT] Failed to extract TikTok Ads ad creative for advertiser_id "
                 f"{advertiser_id} due to "
                 f"{e} with HTTP request status "
-                f"{status} then this API call is not eligible to retry."
+                f"{status} then this request is not eligible to retry."
             ) from e
     
         # Unknown non-retryable error     
