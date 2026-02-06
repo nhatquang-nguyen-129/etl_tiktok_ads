@@ -9,12 +9,12 @@ def transform_ad_insights(
     df: pd.DataFrame
 ) -> pd.DataFrame:
     """
-    Transform Facebook Ads ad insights
+    Transform TikTok Ads ad insights
     ---------
     Workflow:
         1. Validate input
         2. Parse actions
-        3. Resolve results
+        3. No need to resolve results
         4. Normalize date dimension
         5. Enforce numeric schema
     ---------
@@ -25,11 +25,11 @@ def transform_ad_insights(
 
     print(
         "🔄 [TRANSFORM] Transforming "
-        f"{len(df)} row(s) of Facebook Ads ad insights..."
+        f"{len(df)} row(s) of TikTok Ads ad insights..."
     )
 
     if df.empty:
-        print("⚠️ [TRANSFORM] Empty Facebook Ads ad insights then transformation will be suspended.")
+        print("⚠️ [TRANSFORM] Empty TikToks Ads ad insights then transformation will be suspended.")
         return df
 
     required_cols = {
@@ -39,7 +39,7 @@ def transform_ad_insights(
     missing = required_cols - set(df.columns)
     if missing:
         raise ValueError(
-            "❌ [TRANSFORM] Failed to transform Google Ads ad insights due to missing columns "
+            "❌ [TRANSFORM] Failed to transform TikTok Ads ad insights due to missing columns "
             f"{missing} then transformation will be suspended."
         )
     
@@ -63,7 +63,7 @@ def transform_ad_insights(
 
     print(
         "✅ [TRANSFORM] Successfully transformed "
-        f"{len(df)} row(s) of Facebook Ads ad insights."
+        f"{len(df)} row(s) of TikTok Ads ad insights."
     )
 
     return df
