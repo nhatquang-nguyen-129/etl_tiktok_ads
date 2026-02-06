@@ -13,7 +13,7 @@ def load_ad_insights(
     direction: str,
 ) -> None:
     """
-    Load Google Ads ad insights
+    Load TikTok Ads ad insights
     ----------------------
     Workflow:
         1. Validate input DataFrame
@@ -27,12 +27,12 @@ def load_ad_insights(
     """    
 
     if df.empty:
-        print("⚠️ [LOADER] Empty Google Ads ad insights Dataframe then loading will be suspended.")
+        print("⚠️ [LOADER] Empty TikTok Ads ad insights Dataframe then loading will be suspended.")
         return
 
     print(
         "🔄 [LOADER] Triggering to load "
-        f"{len(df)} row(s) of Google Ads ad insights to Google BigQuery table "
+        f"{len(df)} row(s) of TikTok Ads ad insights to Google BigQuery table "
         f"{direction}..."
         )
     
