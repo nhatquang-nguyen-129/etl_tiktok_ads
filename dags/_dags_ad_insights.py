@@ -262,13 +262,14 @@ def dags_ad_insights(
     dfs_ad_creative = []
 
     for attempt in range(1, DAGS_CREATIVE_ATTEMPTS + 1):
-        try:
-            print(
-                "🔄 [DAGS] Trigger to extract TikTok Ads ad creative for advertiser_id "
-                f"{advertiser_id} "
-                f"{attempt}/{DAGS_CREATIVE_ATTEMPTS} attempts..."
-            )
+        print(
+            "🔄 [DAGS] Trigger to extract TikTok Ads ad creative for advertiser_id "
+            f"{advertiser_id} "
+            f"{attempt}/{DAGS_CREATIVE_ATTEMPTS} attempts..."
+        )
 
+    # Extract     
+        try:
             df_ad_creative = extract_ad_creative(
                 access_token=access_token,
                 advertiser_id=advertiser_id,
