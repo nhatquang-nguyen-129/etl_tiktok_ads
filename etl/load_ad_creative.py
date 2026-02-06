@@ -16,7 +16,7 @@ def load_ad_creative(
     Load TikTok Ads ad creative
     ---------
     Workflow:
-        1. Validate input DataFrame
+        1. No need input ad_ids
         2. Validate output direction for Google BigQuery
         3. Set primary key(s) to advertiser_id and ad_id
         4. Use UPSERT mode with temporary table for deduplication
