@@ -10,7 +10,7 @@ from dags._dags_campaign_insights import dags_campaign_insights
 from dags._dags_ad_insights import dags_ad_insights
 
 
-def dags_facebook_ads(
+def dags_tiktok_ads(
     *,
     access_token: str,
     account_id: str,
@@ -19,7 +19,7 @@ def dags_facebook_ads(
     max_workers: int = 2,
 ):
     print(
-        f"🔄 [DAGS] Trigger Facebook Ads DAGs for {account_id} "
+        f"🔄 [DAGS] Trigger TikTok Ads DAGs for {account_id} "
         f"from {start_date} → {end_date} | workers={max_workers}"
     )
 
@@ -71,4 +71,4 @@ def dags_facebook_ads(
                 print()
 
     total_elapsed = round(time.time() - start_time, 2)
-    print(f"🏁 [DAGS] Facebook Ads update finished in {total_elapsed}s")
+    print(f"🏁 [DAGS] TikTok Ads update finished in {total_elapsed}s")
