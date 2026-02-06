@@ -12,15 +12,13 @@ import time
 from etl.extract_ad_insights import extract_ad_insights
 from etl.extract_ad_metadata import extract_ad_metadata
 from etl.extract_ad_creative import extract_ad_creative
-from etl.extract_adset_metadata import extract_adset_metadata
 from etl.extract_campaign_metadata import extract_campaign_metadata
 from etl.transform_ad_insights import transform_ad_insights
-from etl.transform_adset_metadata import transform_adset_metadata
+from etl.transform_ad_metadata import transform_adset_metadata
 from etl.transform_campaign_metadata import transform_campaign_metadata
 from etl.load_ad_insights import load_ad_insights
 from etl.load_ad_metadata import load_ad_metadata
 from etl.load_ad_creative import load_ad_creative
-from etl.load_adset_metadata import load_adset_metadata
 from etl.load_campaign_metadata import load_campaign_metadata
 
 from dbt.run import dbt_facebook_ads

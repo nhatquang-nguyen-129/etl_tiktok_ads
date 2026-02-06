@@ -15,9 +15,11 @@ def extract_ad_creative(
     Extract TikTok Ads ad creative
     ---------
     Workflow:
-        1. Paginate video creative endpoint
-        2. Append extracted JSON data to list[dict]
-        3. Enforce List[dict] to DataFrame
+        1. No need input ad_ids
+        2. No need to loop each ad_id
+        3. Paginate video creative endpoint
+        4. Append extracted JSON data to list[dict]
+        5. Enforce List[dict] to DataFrame
     ---------
     Returns:
         DataFrame:
@@ -29,11 +31,6 @@ def extract_ad_creative(
     retryable = True
 
     # Make TikTok Ads API v1.3 call for ad creative
-    print(
-        "🔍 [EXTRACT] Extracting TikTok Ads ad creative for advertiser_id "
-        f"{advertiser_id}..."
-    )
-
     headers = {
         "Access-Token": access_token,
         "Content-Type": "application/json",
@@ -46,6 +43,11 @@ def extract_ad_creative(
     pagination_continue = True
 
     try:
+        print(
+            "🔍 [EXTRACT] Extracting TikTok Ads ad creative for advertiser_id "
+            f"{advertiser_id}..."
+        )
+        
         while pagination_continue:
             payload = {
                 "advertiser_id": advertiser_id,

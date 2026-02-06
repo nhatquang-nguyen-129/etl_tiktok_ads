@@ -6,11 +6,11 @@ sys.path.append(str(ROOT_FOLDER_LOCATION))
 import logging
 import pandas as pd
 
-def transform_adset_metadata(
+def transform_ad_metadata(
     df: pd.DataFrame
 ) -> pd.DataFrame:
     """
-    Transform TikTok Ads adset metadata
+    Transform TikTok Ads ad metadata
     ---------
     Workflow:
         1. Validate input
