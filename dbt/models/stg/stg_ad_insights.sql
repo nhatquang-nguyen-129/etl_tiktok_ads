@@ -32,7 +32,7 @@ select
 
     cast(null as string)  as advertiser_id,
     cast(null as string)  as campaign_id,
-    cast(null as string)  as adset_id,
+    cast(null as string)  as adgroup_id,
     cast(null as string)  as ad_id,
 
     cast(null as int64)   as impressions,
@@ -40,9 +40,9 @@ select
     cast(null as numeric) as spend,
 
     cast(null as int64)   as result,
-    cast(null as string)  as result_type,
+    cast(null as string)  as optimization_event,
 
-    cast(null as int64)   as messaging_conversations_started,
+    cast(null as int64)   as engaged_view_15s,
     cast(null as int64)   as purchase,
 
     cast(null as date)    as date,
@@ -61,7 +61,7 @@ select
 
     account_id,
     campaign_id,
-    adset_id,
+    adgroup_id,
     ad_id,
 
     date,
@@ -73,9 +73,9 @@ select
     spend,
 
     result,
-    result_type,
+    optimization_event,
 
-    messaging_conversations_started,
+    engaged_view_15s,
     purchase
 
 from `{{ target.project }}.{{ raw_schema }}.{{ table_name }}`
