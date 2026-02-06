@@ -1,4 +1,4 @@
-## Dependency Conflict Management
+## Dependencies Conflict Management
 
 - Edit `base.in` to change dependencies
 - Run `pip install pip-tools` to install pip-tools
