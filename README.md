@@ -2,9 +2,9 @@
   <img src="kidsplaza.png" alt="KidsPlaza Logo" width="300"/>
 </p>
 
-This pipeline integrates **TikTok Ads Insights data**, supporting both **daily synchronization** and **historical backfills**, and serves as the foundation for performance analysis, budget reconciliation, and marketing reporting.
+This pipeline integrates **TikTok Ads Insights data**, supporting both **daily synchronization** and **historical backfills**.
 
-The system is designed with a **modular, stage-based architecture** to ensure maintainability, scalability, and controlled evolution over time.
+The system is designed with a **modular architecture** to ensure maintainability, scalability, and controlled evolution over time.
 
 ---
 
@@ -13,7 +13,7 @@ The system is designed with a **modular, stage-based architecture** to ensure ma
 > **This README documents the behavior and scope of the current architecture development branch:**  
 > **`branch_2x`**
 
-`branch_2x` represents the active **2.x development line**, where major architectural changes, framework redesigns, and foundational improvements are developed and validated before being promoted to production (`main`).
+`branch_2x` represents the active **2.x development line**, focusing on large-scale feature upgrades and platform standardization—migrating from raw Python/SQL execution to structured DAG-based pipelines with dbt, standardized ETL and backfill support, scalable internal plugins, and modern dependency management via conditional installs and pip-tools compilation.
 
 ## Deployment
 
