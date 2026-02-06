@@ -3,7 +3,6 @@ from pathlib import Path
 ROOT_FOLDER_LOCATION = Path(__file__).resolve().parents[2]
 sys.path.append(str(ROOT_FOLDER_LOCATION))
 
-import logging
 import pandas as pd
 
 from plugins.google_bigquery import internalGoogleBigqueryLoader
@@ -28,12 +27,10 @@ def load_campaign_insights(
     """    
 
     if df.empty:
-        msg = ("⚠️ [LOADER] Empty TikTok Ads campaign insights Dataframe then loading will be suspended.")
-        print(msg)
-        logging.warning(msg)
+        print("⚠️ [LOADER] Empty TikTok Ads campaign insights Dataframe then loading will be suspended.")
         return
 
-    msg = (
+    print(
         "🔄 [LOADER] Triggering to load "
         f"{len(df)} row(s) of TikTok Ads campaign insights to Google BigQuery table "
         f"{direction}..."

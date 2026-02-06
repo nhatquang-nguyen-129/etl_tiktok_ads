@@ -4,7 +4,6 @@ ROOT_FOLDER_LOCATION = Path(__file__).resolve().parents[2]
 sys.path.append(str(ROOT_FOLDER_LOCATION))
 
 import time
-import logging
 import requests
 import pandas as pd
 
@@ -69,14 +68,12 @@ def extract_campaign_insights(
         "page": 1
     }
 
-    msg = (
+    print(
         "🔍 [EXTRACT] Extracting TikTok Ads campaign insights for advertiser_id "
         f"{advertiser_id} from "
         f"{start_date} to "
         f"{end_date}..."
     )
-    print(msg)
-    logging.info(msg)
 
     records = []
 

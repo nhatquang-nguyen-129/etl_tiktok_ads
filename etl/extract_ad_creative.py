@@ -39,7 +39,7 @@ def extract_ad_creative(
         "Content-Type": "application/json",
     }
 
-    url = "https://business-api.tiktok.com/open_api/v1.3/file/video/ad/search/"
+    video_url = "https://business-api.tiktok.com/open_api/v1.3/file/video/ad/search/"
 
     page = 1
     page_size = 100
@@ -54,7 +54,7 @@ def extract_ad_creative(
             }
 
             resp = requests.get(
-                url,
+                video_url,
                 headers=headers,
                 json=payload,
             )

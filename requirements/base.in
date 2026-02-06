@@ -1,19 +1,20 @@
-# Python ultilities
-pytz
-requests
+# Python utilities
+pytz; python_version >= "3.9"
 
 # Python libraries
-numpy
-pandas
-pyarrow
+numpy; python_version >= "3.10"
+pandas; python_version >= "3.10"
+pyarrow; python_version >= "3.10"
 
-# Facebook Ads
-facebook-business
+# Google Cloud core
+google-auth; python_version >= "3.9"
+google-api-core; python_version >= "3.9"
 
-# Google Cloud
-google-auth
-google-api-core
-google-cloud-bigquery
-google-cloud-bigquery-storage
-google-cloud-secret-manager
-pandas-gbq
+# Google BigQuery
+google-cloud-bigquery; python_version >= "3.9"
+google-cloud-bigquery-storage; python_version >= "3.9"
+google-cloud-secret-manager; python_version >= "3.9"
+pandas-gbq; python_version >= "3.9"
+
+# dbt adapter
+dbt-bigquery; python_version >= "3.9"

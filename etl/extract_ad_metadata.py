@@ -3,24 +3,22 @@ from pathlib import Path
 ROOT_FOLDER_LOCATION = Path(__file__).resolve().parents[2]
 sys.path.append(str(ROOT_FOLDER_LOCATION))
 
-from typing import List
 import time
-import logging
 import requests
 import pandas as pd
 
-
 def extract_ad_metadata(
-    advertiser_id: str,
     access_token: str,
-    ad_id_list: List[str],
+    advertiser_id: str,    
+    ad_ids: list[str],
 ) -> pd.DataFrame:
     """
     Extract TikTok Ads ad metadata
     ---------
     Workflow:
-        1. Fetch advertiser name
-        2. Fetch ad metadata (per ad_id)
+        1. Validate input ad_ids
+        2. Make API call for v1.3/advertiser/info
+        2. Make API call for v1.3/ad/get
         3. Append extracted JSON data to list[dict]
         4. Enforce List[dict] to DataFrame
     ---------
@@ -35,16 +33,6 @@ def extract_ad_metadata(
     retryable = True
 
     # Validate input
-    if isinstance(ad_id_list, dict):
-        ad_ids = list(ad_id_list.values())
-    elif isinstance(ad_id_list, list):
-        ad_ids = ad_id_list
-    else:
-        raise TypeError(
-            "❌ [EXTRACT] Failed to extract TikTok Ads ad metadata for advertiser_id "
-            f"{advertiser_id} due to ad_id_list must be List[str] or Dict[Any, str]."
-        )
-
     if not ad_ids:
         df = pd.DataFrame(
             columns=[
@@ -69,19 +57,17 @@ def extract_ad_metadata(
         df.rows_output = 0
         return df
 
+    # Make TikTok Ads API v1.3 call for advertiser name
     headers = {
         "Access-Token": access_token,
         "Content-Type": "application/json",
     }
 
-    # Make TikTok Ads API v1.3 call for advertiser name
     try:
-        msg = (
+        print(
             "🔍 [EXTRACT] Extracting TikTok Ads advertiser_name for advertiser_id "
             f"{advertiser_id}..."
         )
-        print(msg)
-        logging.info(msg)
 
         advertiser_url = "https://business-api.tiktok.com/open_api/v1.3/advertiser/info/"
         advertiser_payload = {"advertiser_ids": [advertiser_id]}
@@ -131,13 +117,11 @@ def extract_ad_metadata(
 
         advertiser_name = data["data"]["list"][0].get("advertiser_name")
 
-        msg = (
+        print(
             "✅ [EXTRACT] Successfully extracted TikTok Ads advertiser_name "
             f"{advertiser_name} for advertiser_id "
             f"{advertiser_id}."
         )
-        print(msg)
-        logging.info(msg)
 
     except requests.HTTPError as e:
         status = e.response.status_code if e.response else None
@@ -168,13 +152,11 @@ def extract_ad_metadata(
         ) from e
 
     # Make TikTok Ads API v1.3 call for ad metadata
-    msg = (
+    print(
         "🔍 [EXTRACT] Extracting TikTok Ads ad metadata for advertiser_id "
         f"{advertiser_id} with "
-        f"{len(ad_id_list)} ad_id(s)..."
+        f"{len(ad_ids)} ad_id(s)..."
     )
-    print(msg)
-    logging.info(msg)
 
     ad_url = "https://business-api.tiktok.com/open_api/v1.3/ad/get/"
     ad_fields = [
@@ -230,14 +212,12 @@ def extract_ad_metadata(
                     
                     failed_ad_ids.append(ad_id)
 
-                    msg = (
+                    print(
                         "⚠️ [EXTRACT] Failed to extract TikTok Ads ad metadata for ad_id "
                         f"{ad_id} due to API error "
                         f"{message} with error code "
                         f"{code} then request for this ad_id is eligible to retry."
                     )
-                    print(msg)
-                    logging.warning(msg)
 
                     rows.append(
                         {
@@ -299,14 +279,12 @@ def extract_ad_metadata(
             if status and status >= 500:
                 failed_ad_ids.append(ad_id)
 
-                msg = (
+                print(
                     "⚠️ [EXTRACT] Failed to extract TikTok ad metadata for ad_id "
                     f"{ad_id} due to "
                     f"{e} with HTTP request status "
                     f"{status} then request for this ad_id is eligible to retry."
                 )
-                print(msg)
-                logging.warning(msg)
 
                 rows.append(
                     {

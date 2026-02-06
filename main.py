@@ -114,7 +114,7 @@ def main():
             f"{e}."
         )
         
-# Resolve account_id from Google Secret Manager
+# Resolve advertiser from Google Secret Manager
     try:
         secret_account_id = (
             f"{COMPANY}_secret_{DEPARTMENT}_tiktok_account_id_{ACCOUNT}"
@@ -134,11 +134,11 @@ def main():
             name=secret_account_name,
             timeout=10.0,
         )
-        account_id = secret_account_response.payload.data.decode("utf-8")
+        advertiser_id = secret_account_response.payload.data.decode("utf-8")
         
         msg = (
-            "✅ [MAIN] Successfully retrieved TikTok Ads account_id "
-            f"{account_id} from Google Secret Manager."
+            "✅ [MAIN] Successfully retrieved TikTok Ads advertiser_id "
+            f"{advertiser_id} from Google Secret Manager."
         )
         print(msg)
         logging.info(msg)
@@ -183,7 +183,7 @@ def main():
 # Execute DAGS
     dags_tiktok_ads(
         access_token=access_token,
-        account_id=account_id,
+        advertiser_id=advertiser_id,
         start_date=start_date,
         end_date=end_date
     )

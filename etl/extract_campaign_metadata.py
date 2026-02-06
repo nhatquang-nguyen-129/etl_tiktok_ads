@@ -5,14 +5,13 @@ sys.path.append(str(ROOT_FOLDER_LOCATION))
 
 from typing import List
 import time
-import logging
 import requests
 import pandas as pd
 
 def extract_campaign_metadata(
     advertiser_id: str,
     access_token: str,
-    campaign_id_list: List[str],
+    campaign_ids: List[str],
 ) -> pd.DataFrame:
     """
     Extract TikTok Ads campaign metadata
@@ -34,16 +33,6 @@ def extract_campaign_metadata(
     retryable = True
 
     # Validate input
-    if isinstance(campaign_id_list, dict):
-        campaign_ids = list(campaign_id_list.values())
-    elif isinstance(campaign_id_list, list):
-        campaign_ids = campaign_id_list
-    else:
-        raise TypeError(
-            "❌ [EXTRACT] Failed to extract TikTok Ads campaign metadata for advertiser_id "
-            f"{advertiser_id} due to campaign_id_list must be List[str] or Dict[Any, str]."
-        )
-
     if not campaign_ids:
         df = pd.DataFrame(
             columns=[
@@ -61,19 +50,17 @@ def extract_campaign_metadata(
         df.rows_output = 0
         return df
 
+    # Make TikTok Ads API v1.3 call for advertiser name
     headers = {
         "Access-Token": access_token,
         "Content-Type": "application/json",
     }
-
-    # Make TikTok Ads API v1.3 call for advertiser name
+    
     try:
-        msg = (
+        print(
             "🔍 [EXTRACT] Extracting TikTok Ads advertiser_name for advertiser_id "
             f"{advertiser_id}..."
         )
-        print(msg)
-        logging.info(msg)
 
         advertiser_url = "https://business-api.tiktok.com/open_api/v1.3/advertiser/info/"
         advertiser_payload = {"advertiser_ids": [advertiser_id]}
@@ -123,13 +110,11 @@ def extract_campaign_metadata(
 
         advertiser_name = data["data"]["list"][0].get("advertiser_name")
 
-        msg = (
+        print(
             "✅ [EXTRACT] Successfully extracted TikTok Ads advertiser_name "
             f"{advertiser_name} for advertiser_id "
             f"{advertiser_id}."
         )
-        print(msg)
-        logging.info(msg)
 
     except requests.HTTPError as e:
         status = e.response.status_code if e.response else None
@@ -160,13 +145,11 @@ def extract_campaign_metadata(
         ) from e
 
     # Make TikTok Ads API v1.3 call for campaign metadata
-    msg = (
+    print(
         "🔍 [EXTRACT] Extracting TikTok Ads campaign metadata for advertiser_id "
         f"{advertiser_id} with "
-        f"{len(campaign_id_list)} campaign_id(s)..."
+        f"{len(campaign_ids)} campaign_id(s)..."
     )
-    print(msg)
-    logging.info(msg)
 
     for campaign_id in campaign_ids:
         try:
@@ -212,14 +195,12 @@ def extract_campaign_metadata(
                     
                     failed_campaign_ids.append(campaign_id)
 
-                    msg = (
+                    print(
                         "⚠️ [EXTRACT] Failed to extract TikTok Ads campaign metadata for campaign_id "
                         f"{campaign_id} due to API error "
                         f"{message} with error code "
                         f"{code} then request for this campaign_id is eligible to retry."
                     )
-                    print(msg)
-                    logging.warning(msg)
 
                     rows.append(
                         {
@@ -271,14 +252,12 @@ def extract_campaign_metadata(
             if status and status >= 500:
                 failed_campaign_ids.append(campaign_id)
 
-                msg = (
+                print(
                     "⚠️ [EXTRACT] Failed to extract TikTok campaign metadata for campaign_id "
                     f"{campaign_id} due to "
                     f"{e} with HTTP request status "
                     f"{status} then request for this campaign_id is eligible to retry."
                 )
-                print(msg)
-                logging.warning(msg)
 
                 rows.append(
                     {

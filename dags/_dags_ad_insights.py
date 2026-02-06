@@ -33,13 +33,13 @@ MODE = os.getenv("MODE")
 
 def dags_ad_insights(
     *,
-    account_id: str,
+    advertiser_id: str,
     start_date: str,
     end_date: str,
 ):
     msg = (
-        "🔁 [DAGS] Trigger to update Facebook Ads ad insights with account_id "
-        f"{account_id} from "
+        "🔁 [DAGS] Trigger to update Facebook Ads ad insights with advertiser_id "
+        f"{advertiser_id} from "
         f"{start_date} to "
         f"{end_date}..."
     )
@@ -63,8 +63,8 @@ def dags_ad_insights(
                 
     # Extract
                 msg = (
-                    "🔁 [DAGS] Trigger to extract Facebook Ads ad insights from account_id "
-                    f"{account_id} at "
+                    "🔁 [DAGS] Trigger to extract Facebook Ads ad insights from advertiser_id "
+                    f"{advertiser_id} at "
                     f"{dags_split_date} for "
                     f"{attempt} attempt(s)..."
                 )
@@ -72,7 +72,7 @@ def dags_ad_insights(
                 logging.info(msg)                
                 
                 insights = extract_ad_insights(
-                    account_id=account_id,
+                    advertiser_id=advertiser_id,
                     start_date=dags_split_date,
                     end_date=dags_split_date,
                 )
