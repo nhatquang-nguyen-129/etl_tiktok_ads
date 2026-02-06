@@ -152,6 +152,7 @@ def extract_campaign_metadata(
         "campaign_id",
         "campaign_name",
         "status",
+        "objective_type",
         "advertiser_id",
         "advertiser_name",
     ]
