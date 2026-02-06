@@ -152,14 +152,8 @@ def extract_ad_metadata(
         ) from e
 
     # Make TikTok Ads API v1.3 call for ad metadata
-    print(
-        "🔍 [EXTRACT] Extracting TikTok Ads ad metadata for advertiser_id "
-        f"{advertiser_id} with "
-        f"{len(ad_ids)} ad_id(s)..."
-    )
-
-    ad_url = "https://business-api.tiktok.com/open_api/v1.3/ad/get/"
-    ad_fields = [
+    ad_metadata_url = "https://business-api.tiktok.com/open_api/v1.3/ad/get/"
+    ad_metadata_fields = [
         "ad_id",
         "ad_name",
         "adgroup_id",
@@ -173,16 +167,22 @@ def extract_ad_metadata(
         "video_id",
     ]
 
+    print(
+        "🔍 [EXTRACT] Extracting TikTok Ads ad metadata for advertiser_id "
+        f"{advertiser_id} with "
+        f"{len(ad_ids)} ad_id(s)..."
+    )
+
     for ad_id in ad_ids:
         try:
             payload = {
                 "advertiser_id": advertiser_id,
                 "filtering": {"ad_ids": [ad_id]},
-                "fields": ad_fields,
+                "fields": ad_metadata_fields,
             }
 
             resp = requests.get(
-                ad_url,
+                ad_metadata_url,
                 headers=headers,
                 json=payload,
             )
