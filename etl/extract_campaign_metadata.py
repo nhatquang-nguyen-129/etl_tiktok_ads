@@ -39,7 +39,7 @@ def extract_campaign_metadata(
             columns=[
                 "campaign_id",
                 "campaign_name",
-                "status",
+                "operation_status",
                 "advertiser_id",
                 "advertiser_name",
             ]
@@ -151,7 +151,7 @@ def extract_campaign_metadata(
     fields = [
         "campaign_id",
         "campaign_name",
-        "status",
+        "operation_status",
         "objective_type",
         "advertiser_id",
         "advertiser_name",
@@ -213,7 +213,7 @@ def extract_campaign_metadata(
                         {
                             "campaign_id": campaign_id,
                             "campaign_name": None,
-                            "status": None,
+                            "operation_status": None,
                             "advertiser_id": advertiser_id,
                             "advertiser_name": advertiser_name,
                         }
@@ -236,7 +236,7 @@ def extract_campaign_metadata(
                     {
                         "campaign_id": campaign.get("campaign_id"),
                         "campaign_name": campaign.get("campaign_name"),
-                        "status": campaign.get("status"),
+                        "operation_status": campaign.get("operation_status"),
                         "advertiser_id": advertiser_id,
                         "advertiser_name": advertiser_name,
                     }
@@ -246,7 +246,7 @@ def extract_campaign_metadata(
                     {
                         "campaign_id": campaign_id,
                         "campaign_name": None,
-                        "status": None,
+                        "operation_status": None,
                         "advertiser_id": advertiser_id,
                         "advertiser_name": advertiser_name,
                     }
@@ -270,7 +270,7 @@ def extract_campaign_metadata(
                     {
                         "campaign_id": campaign_id,
                         "campaign_name": None,
-                        "status": None,
+                        "operation_status": None,
                         "advertiser_id": advertiser_id,
                         "advertiser_name": advertiser_name,
                     }

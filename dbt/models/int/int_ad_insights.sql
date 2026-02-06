@@ -1,26 +1,36 @@
 {{ 
   config(
     materialized = 'ephemeral',
-    tags = ['int', 'facebook', 'ad']
+    tags = ['int', 'tiktok', 'ad']
   ) 
 }}
 
 select
     date(insights.date) as date,
 
-    insights.account_id,
+    insights.advertiser_id,
     insights.campaign_id,
-    insights.adset_id,
+    insights.adgroup_id,
     insights.ad_id,
 
     ad.ad_name,
 
     case
-        when ad.status = 'ACTIVE'                 then '🟢'
-        when ad.status = 'PAUSED'                 then '⚪'
-        when ad.status in ('ARCHIVED','DELETED')  then '🔴'
+        when ad.operation_status = 'ENABLE'                 then '🟢'
+        when ad.operation_status = 'DISABLE'                then '⚪'
+        when ad.operation_status in ('ARCHIVED','DELETED')  then '🔴'
         else '❓'
     end as ad_status,
+
+    ad.location,
+    ad.gender,
+    ad.age,
+    ad.audience,
+    ad.format,
+    ad.strategy,
+    ad.type,
+    ad.pillar,
+    ad.content,
 
     campaign.campaign_name,
     campaign.platform,
@@ -32,42 +42,28 @@ select
     campaign.pillar_group,
     campaign.content_group,
 
-    adset.location,
-    adset.gender,
-    adset.age,
-    adset.audience,
-    adset.format,
-    adset.strategy,
-    adset.type,
-    adset.pillar,
-    adset.content,
-
-    creative.thumbnail_url,
+    creative.video_cover_url,
 
     insights.impressions,
     insights.clicks,
     insights.spend,
 
     insights.result,
-    insights.result_type,
+    insights.optimization_event,
 
-    insights.messaging_conversations_started,
+    insights.engaged_view_15s,
     insights.purchase
 
 from {{ ref('stg_ad_insights') }} insights
 
-left join {{ ref('stg_ad_metadata') }} ad
-    on insights.account_id = ad.account_id
-   and insights.ad_id      = ad.ad_id
+left join `{{ target.project }}.{{ var('company') }}_dataset_tiktok_api_raw.{{ var('company') }}_table_tiktok_{{ var('department') }}_{{ var('account') }}_ad_metadata` ad
+    on insights.advertiser_id = ad.advertiser_id
+   and insights.ad_id         = ad.ad_id
 
-left join {{ ref('stg_campaign_metadata') }} campaign
-    on insights.account_id  = campaign.account_id
-   and insights.campaign_id = campaign.campaign_id
+left join `{{ target.project }}.{{ var('company') }}_dataset_tiktok_api_raw.{{ var('company') }}_table_tiktok_{{ var('department') }}_{{ var('account') }}_campaign_metadata` campaign
+    on insights.advertiser_id = campaign.advertiser_id
+   and insights.campaign_id  = campaign.campaign_id
 
-left join {{ ref('stg_adset_metadata') }} adset
-    on insights.account_id = adset.account_id
-   and insights.adset_id   = adset.adset_id
-
-left join {{ ref('stg_ad_creative') }} creative
-    on insights.account_id = creative.account_id
-   and insights.ad_id      = creative.ad_id
+left join `{{ target.project }}.{{ var('company') }}_dataset_tiktok_api_raw.{{ var('company') }}_table_tiktok_{{ var('department') }}_{{ var('account') }}_ad_creative` creative
+    on ad.advertiser_id = creative.advertiser_id
+   and ad.video_id      = creative.video_id
