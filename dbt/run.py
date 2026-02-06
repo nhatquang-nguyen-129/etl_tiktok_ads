@@ -3,14 +3,13 @@ from pathlib import Path
 ROOT_FOLDER_LOCATION = Path(__file__).resolve().parents[0]
 sys.path.append(str(ROOT_FOLDER_LOCATION))
 
-import logging
 import os
 import subprocess
 
 def dbt_tiktok_ads(
     *,
     google_cloud_project: str,
-    select: str = "tag:mart",
+    select: str
 ):
     """
     Run dbt for TikTok Ads
@@ -21,52 +20,40 @@ def dbt_tiktok_ads(
         3. Capture dbt execution logs with stdout and stderr
     ---------
     Returns:
-        1. subprocess.CompletedProcess:
-            Contains dbt execution result including stdout, stderr, and return code
+        None
     """
-
-    msg = (
-        "🔁 [DBT] Running dbt build for TikTok Ads with selector "
-        f"{select} to Google Cloud Project "
-        f"{google_cloud_project}..."
-    )
-    print(msg)
-    logging.info(msg)
 
     cmd = [
         "dbt",
         "build",
-        "--project-dir", "dbt",
-        "--profiles-dir", "dbt",
+        "--profiles-dir", ".",
         "--select", select,
     ]
 
+    print(
+        "🔄 [DBT] Executing dbt build for TikTok Ads "
+        f"{select} insights to Google Cloud Project "
+        f"{google_cloud_project}..."
+    )
+
     try:
-        result = subprocess.run(
+        subprocess.run(
             cmd,
+            cwd="dbt",
+            env=os.environ,
             check=True,
-            env={**os.environ},
-            text=True,
         )
 
-        print(result.stdout)
-        logging.info(result.stdout)
-
-        msg = (
-            "✅ [DBT] Successfully completed dbt build for TikTok Ads with selector "
-            f"{select} to Google Cloud Project "
+        print(
+            "✅ [DBT] Successfully executed dbt build for TikTok Ads "
+            f"{select} insights to Google Cloud Project "
             f"{google_cloud_project}."
         )
-        print(msg)
-        logging.info(msg)
 
     except subprocess.CalledProcessError as e:
-        print(e.stdout)
-        logging.error(e.stdout)
-        print(e.stderr)
-        logging.error(e.stderr)
         raise RuntimeError(
-            "❌ [DBT] Failed to complete dbt build for TikTok Ads with selector " 
-            f"{select} to Google Cloud Project "
-            f"{google_cloud_project} due to {e}."
-        )
+            "❌ [DBT] Failed to execute dbt build for TikTok Ads "
+            f"{select} insights to Google Cloud Project "
+            f"{google_cloud_project} due to "
+            f"{e}."
+        ) from e
