@@ -69,16 +69,16 @@ def extract_ad_insights(
         "page": 1
     }
 
-    print(
-        "🔍 [EXTRACT] Extracting TikTok Ads ad insights for advertiser_id "
-        f"{advertiser_id} from "
-        f"{start_date} to "
-        f"{end_date}..."
-    )
-
     records = []
 
     try:
+        print(
+            "🔍 [EXTRACT] Extracting TikTok Ads ad insights for advertiser_id "
+            f"{advertiser_id} from "
+            f"{start_date} to "
+            f"{end_date}..."
+        )
+
         while True:
             resp = requests.get(
                 ad_insights_url,
