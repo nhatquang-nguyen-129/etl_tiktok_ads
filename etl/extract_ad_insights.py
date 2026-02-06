@@ -31,7 +31,7 @@ def extract_ad_insights(
     start_time = time.time()
 
     # Make TikTok Ads API v1.3 call for ad insights
-    url = "https://business-api.tiktok.com/open_api/v1.3/report/integrated/get/"
+    ad_insights_url = "https://business-api.tiktok.com/open_api/v1.3/report/integrated/get/"
     
     headers = {
         "Access-Token": access_token,
@@ -81,7 +81,7 @@ def extract_ad_insights(
     try:
         while True:
             resp = requests.get(
-                url,
+                ad_insights_url,
                 headers=headers,
                 json=payload,
                 timeout=60
