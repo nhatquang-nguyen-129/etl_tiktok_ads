@@ -1,13 +1,13 @@
 {{ 
   config(
     materialized = 'ephemeral',
-    tags = ['stg', 'facebook', 'ad']
+    tags = ['stg', 'tiktok', 'ad']
   ) 
 }}
 
 {% set company = var('company') %}
-{% set raw_schema = company ~ '_dataset_facebook_api_raw' %}
-{% set table_prefix = company ~ '_table_facebook_' %}
+{% set raw_schema = company ~ '_dataset_tiktok_api_raw' %}
+{% set table_prefix = company ~ '_table_tiktok_' %}
 
 {% if execute %}
 
@@ -30,7 +30,7 @@ select
     cast(null as string)  as department,
     cast(null as string)  as account,
 
-    cast(null as string)  as account_id,
+    cast(null as string)  as advertiser_id,
     cast(null as string)  as campaign_id,
     cast(null as string)  as adset_id,
     cast(null as string)  as ad_id,
