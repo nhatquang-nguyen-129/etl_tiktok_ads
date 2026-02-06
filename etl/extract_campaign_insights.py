@@ -30,7 +30,7 @@ def extract_campaign_insights(
 
     start_time = time.time()
 
-    url = "https://business-api.tiktok.com/open_api/v1.3/report/integrated/get/"
+    campaign_insights_url = "https://business-api.tiktok.com/open_api/v1.3/report/integrated/get/"
     
     headers = {
         "Access-Token": access_token,
@@ -68,20 +68,20 @@ def extract_campaign_insights(
         "page": 1
     }
 
-    print(
-        "🔍 [EXTRACT] Extracting TikTok Ads campaign insights for advertiser_id "
-        f"{advertiser_id} from "
-        f"{start_date} to "
-        f"{end_date}..."
-    )
-
     records = []
 
     # Make TikTok Ads API v1.3 call for campaign insights
     try:
+        print(
+            "🔍 [EXTRACT] Extracting TikTok Ads campaign insights for advertiser_id "
+            f"{advertiser_id} from "
+            f"{start_date} to "
+            f"{end_date}..."
+        )        
+
         while True:
             resp = requests.get(
-                url,
+                campaign_insights_url,
                 headers=headers,
                 json=payload,
                 timeout=60
