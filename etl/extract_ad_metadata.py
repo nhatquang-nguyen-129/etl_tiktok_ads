@@ -251,9 +251,23 @@ def extract_ad_metadata(
 
             if ad_list:
                 ad = ad_list[0]
-                ad["advertiser_id"] = advertiser_id
-                ad["advertiser_name"] = advertiser_name
-                rows.append(ad)
+                rows.append(
+                    {
+                        "advertiser_id": advertiser_id,
+                        "advertiser_name": advertiser_name,
+                        "ad_id": ad.get("ad_id"),
+                        "ad_name": ad.get("ad_name"),
+                        "adgroup_id": ad.get("adgroup_id"),
+                        "adgroup_name": ad.get("adgroup_name"),
+                        "campaign_id": ad.get("campaign_id"),
+                        "campaign_name": ad.get("campaign_name"),
+                        "operation_status": ad.get("operation_status"),
+                        "create_time": ad.get("create_time"),
+                        "ad_format": ad.get("ad_format"),
+                        "optimization_event": ad.get("optimization_event"),
+                        "video_id": ad.get("video_id"),
+                    }
+                )
             else:
                 rows.append(
                     {

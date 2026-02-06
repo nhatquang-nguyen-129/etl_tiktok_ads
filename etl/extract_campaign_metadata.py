@@ -17,8 +17,9 @@ def extract_campaign_metadata(
     Extract TikTok Ads campaign metadata
     ---------
     Workflow:
-        1. Fetch advertiser name
-        2. Fetch campaign metadata
+        1. Validate input campaign_ids
+        2. Make API call for v1.3/advertiser/info
+        2. Make API call for v1.3/campaign/get
         3. Append extracted JSON data to list[dict]
         4. Enforce List[dict] to DataFrame
     ---------
@@ -145,6 +146,16 @@ def extract_campaign_metadata(
         ) from e
 
     # Make TikTok Ads API v1.3 call for campaign metadata
+    campaign_metadata_url = "https://business-api.tiktok.com/open_api/v1.3/campaign/get/"
+    
+    fields = [
+        "campaign_id",
+        "campaign_name",
+        "status",
+        "advertiser_id",
+        "advertiser_name",
+    ]
+
     print(
         "🔍 [EXTRACT] Extracting TikTok Ads campaign metadata for advertiser_id "
         f"{advertiser_id} with "
@@ -153,21 +164,16 @@ def extract_campaign_metadata(
 
     for campaign_id in campaign_ids:
         try:
-            campaign_url = "https://business-api.tiktok.com/open_api/v1.3/campaign/get/"
-            campaign_payload = {
+            payload = {
                 "advertiser_id": advertiser_id,
                 "filtering": {"campaign_ids": [campaign_id]},
-                "fields": [
-                    "campaign_id",
-                    "campaign_name",
-                    "status",
-                ],
-            }
+                "fields": fields,
+            }            
 
             resp = requests.get(
-                campaign_url,
+                campaign_metadata_url,
                 headers=headers,
-                json=campaign_payload,
+                json=payload,
             )
             resp.raise_for_status()
             data = resp.json()
