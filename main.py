@@ -1,138 +1,196 @@
-"""
-==================================================================
-TIKTOK MAIN ENTRYPOINT
-------------------------------------------------------------------
-This script serves as the unified CLI controller for triggering  
-ads data updates from TikTok Ads based on command-line arguments 
-and environment variables.
-
-It supports incremental daily ingestion for selected data layers  
-(e.g., campaign, ad) and allows flexible control over date ranges.
-
-✔️ Dynamic routing to the correct update module based on PLATFORM  
-✔️ CLI flags to select data layers and date range mode  
-✔️ Shared logging and error handling across update jobs  
-✔️ Supports scheduled jobs or manual on-demand executions 
-✔️ Automatic update summary and execution timing for each step
-
-⚠️ This script does not contain data processing logic itself.  
-It simply delegates update tasks to platform-specific modules .
-==================================================================
-"""
-
-# Add project root to sys.path to enable absolute imports
 import os
+from pathlib import Path
 import sys
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
+ROOT_FOLDER_LOCATION = Path(__file__).resolve().parents[0]
+sys.path.append(str(ROOT_FOLDER_LOCATION))
 
-# Add Python datetime utilities for integration
-from datetime import (
-    datetime, 
-    timedelta
-)
-
-# Add Python dynamic platform-specific ultilities for integration
-import importlib
-
-# Add Python logging ultilities for integration
+from datetime import datetime, timedelta
 import logging
-
-# Add Python IANA time zone ultilities for integration
 from zoneinfo import ZoneInfo
 
-# Get environment variable for Company
-COMPANY = os.getenv("COMPANY") 
+from google.cloud import secretmanager
+from google.api_core.client_options import ClientOptions
 
-# Get environment variable for Google Cloud Project ID
+from dags.dags_tiktok_ads import dags_tiktok_ads
+
+COMPANY = os.getenv("COMPANY")
 PROJECT = os.getenv("PROJECT")
-
-# Get environment variable for Platform
-PLATFORM = os.getenv("PLATFORM")
-
-# Get environmetn variable for Department
 DEPARTMENT = os.getenv("DEPARTMENT")
-
-# Get environment variable for Account
 ACCOUNT = os.getenv("ACCOUNT")
-
-# Get nvironment variable for Layer
-LAYER = os.getenv("LAYER")
-
-# Get environment variable for Mode
 MODE = os.getenv("MODE")
 
-# Get validated environment variables
-if not all([COMPANY, PLATFORM, ACCOUNT, LAYER, MODE]):
-    raise EnvironmentError("❌ [MAIN] Missing required environment variables COMPANY/PLATFORM/ACCOUNT/LAYER/MODE.")
+if not all([
+    COMPANY,
+    PROJECT,
+    DEPARTMENT,
+    ACCOUNT,
+    MODE
+]):
+    raise EnvironmentError("❌ [MAIN] Failed to execute TikTok Ads main entrypoint due to missing required environment variables.")
 
-# 1. DYNAMIC IMPORT MODULE BASED ON PLATFORM
-if PLATFORM != "tiktok":
-    raise ValueError("❌ [MAIN] Only PLATFORM=tiktok is supported in this script.")
-try:
-    update_module = importlib.import_module(f"src.update")
-except ModuleNotFoundError:
-    raise ImportError(f"❌ [MAIN] Platform '{PLATFORM}' is not supported so please ensure src/update.py exists.")
-
-# 1. MAIN ENTRYPOINT CONTROLLER
-
-# 1.1. Validate input for main entrypoint function
-if PLATFORM != "tiktok":
-    raise ValueError("❌ [MAIN] Only 'tiktok' platform is supported in this script.")
-try:
-    update_module_location = importlib.import_module(f"src.update")
-except ModuleNotFoundError:
-    raise ImportError(f"❌ [MAIN] Platform '{PLATFORM}' is not supported so please ensure src/update.py exists.")
-
-# 1.2. Execution controller
 def main():
-    ICT = ZoneInfo("Asia/Ho_Chi_Minh")
-    main_date_today = datetime.now(ICT)
-    if PLATFORM == "tiktok":
-        try:
-            update_campaign_insights = update_module_location.update_campaign_insights
-            update_ad_insights = update_module_location.update_ad_insights
-        except AttributeError:
-            raise ImportError(f"❌ [MAIN] Failed to locate TikTok Ads update module due to update_campaign_insights and update_ad_insights must be defined.")
-        main_layers_variable = [layer.strip() for layer in LAYER.split(",") if layer.strip()]
-        if len(main_layers_variable) != 1:
-            raise ValueError("⚠️ [MAIN] Only one layer is supported per execution so please run separately for each layer.")
-        if MODE == "today":
-            main_date_start = main_date_end = main_date_today.strftime("%Y-%m-%d")
-        elif MODE == "last3days":
-            main_date_start = (main_date_today - timedelta(days=3)).strftime("%Y-%m-%d")
-            main_date_end = (main_date_today - timedelta(days=1)).strftime("%Y-%m-%d")      
-        elif MODE == "last7days":
-            main_date_start = (main_date_today - timedelta(days=7)).strftime("%Y-%m-%d")
-            main_date_end = (main_date_today - timedelta(days=1)).strftime("%Y-%m-%d")
-        elif MODE == "thismonth":
-            main_date_start = main_date_today.replace(day=1).strftime("%Y-%m-%d")
-            main_date_end = main_date_today.strftime("%Y-%m-%d")
-        elif MODE == "lastmonth":
-            main_date_start = (main_date_today.replace(day=1) - timedelta(days=1)).replace(day=1).strftime("%Y-%m-%d")
-            main_date_end = (main_date_today.replace(day=1) - timedelta(days=1)).strftime("%Y-%m-%d")
-        else:
-            raise ValueError(f"⚠️ [MAIN] Unsupported mode {MODE} for TikTok Ads main entrypoint so please re-check input environment variable.")
-        if "campaign" in main_layers_variable:
-            try:
-                print(f"🚀 [MAIN] Starting to update '{PLATFORM}' campaign performance of '{COMPANY}' company in '{MODE}' mode and '{LAYER}' layer from {main_date_start} to {main_date_end}...")
-                logging.info(f"🚀 [MAIN] Starting to update '{PLATFORM}' campaign performance of '{COMPANY}' company in '{MODE}' mode and '{LAYER}' layer from {main_date_start} to {main_date_end}...")
-                update_campaign_insights(update_date_start=main_date_start, update_date_end=main_date_end)
-            except Exception as e:
-                print(f"❌ [MAIN] Failed to trigger update '{PLATFORM}' campaign insights of '{COMPANY}' in '{MODE}' mode and '{LAYER}' layer from {main_date_start} to {main_date_end} due to {e}.")
-                logging.error(f"❌ [MAIN] Failed to trigger update '{PLATFORM}' campaign insights of '{COMPANY}' in '{MODE}' mode and '{LAYER}' layer from {main_date_start} to {main_date_end} due to {e}.")
-        if "ad" in main_layers_variable:
-            try:
-                print(f"🚀 [MAIN] Starting to update '{PLATFORM}' ad performance of '{COMPANY}' in '{MODE}' mode and '{LAYER}' layer from {main_date_start} to {main_date_end}...")
-                logging.info(f"🚀 [MAIN] Starting to update '{PLATFORM}' ad performance of '{COMPANY}' in '{MODE}' mode and '{LAYER}' layer from {main_date_start} to {main_date_end}...")
-                update_ad_insights(update_date_start=main_date_start, update_date_end=main_date_end)
-            except Exception as e:
-                print(f"❌ [MAIN] Failed to trigger update '{PLATFORM}' ad insights of '{COMPANY}' in '{MODE}' mode and '{LAYER}' layer from {main_date_start} to {main_date_end} due to {e}.")
-                logging.error(f"❌ [MAIN] Failed to trigger update '{PLATFORM}' ad insights of '{COMPANY}' in '{MODE}' mode and '{LAYER}' layer from {main_date_start} to {main_date_end} due to {e}.")
+    """
+    Main TikTok Ads entrypoint
+    ---------
+    Workflow:
+        1. Resolve execution time window from MODE
+        2. Read & validate OS environment variables
+        3. Load secrets from GCP Secret Manager
+        4. Resolve advertiser_id and access_token
+        5. Dispatch execution to DAG orchestrator
+    Return:
+        None
+    """
+    
+    msg = (
+        "🔄 [MAIN] Triggering to update TikTok Ads for "
+        f"{ACCOUNT} account of "
+        f"{DEPARTMENT} department in "
+        f"{COMPANY} company with "
+        f"{MODE} mode to Google Cloud project "
+        f"{PROJECT}..."
+    )
+    print(msg)
+    logging.info(msg)    
 
-# 1.3. Execute main entrypoint function
+# Resolve input time range
+    ICT = ZoneInfo("Asia/Ho_Chi_Minh")
+    today = datetime.now(ICT)
+    
+    if MODE == "today":
+        start_date = end_date = today.strftime("%Y-%m-%d")
+
+    elif MODE == "last3days":
+        start_date = (today - timedelta(days=3)).strftime("%Y-%m-%d")
+        end_date = (today - timedelta(days=1)).strftime("%Y-%m-%d")
+
+    elif MODE == "last7days":
+        start_date = (today - timedelta(days=7)).strftime("%Y-%m-%d")
+        end_date = (today - timedelta(days=1)).strftime("%Y-%m-%d")
+
+    elif MODE == "thismonth":
+        start_date = today.replace(day=1).strftime("%Y-%m-%d")
+        end_date = today.strftime("%Y-%m-%d")
+
+    elif MODE == "lastmonth":
+        last_month_end = today.replace(day=1) - timedelta(days=1)
+        start_date = last_month_end.replace(day=1).strftime("%Y-%m-%d")
+        end_date = last_month_end.strftime("%Y-%m-%d")
+
+    else:
+        raise ValueError(
+            "⚠️ [MAIN] Failed to trigger TikTok Ads main entrypoint due to unsupported mode "
+            f"{MODE}."
+        )
+    
+    msg = (
+        "✅ [MAIN] Successfully resolved "
+        f"{MODE} mode to date range from "
+        f"{start_date} to "
+        f"{end_date}."
+    )
+    print(msg)
+    logging.info(msg)
+
+# Initialize Google Secret Manager
+    try:
+        msg = ("🔍 [MAIN] Initialize Google Secret Manager client...")
+        print(msg)
+        logging.info(msg)
+        
+        google_secret_client = secretmanager.SecretManagerServiceClient(
+            client_options=ClientOptions(
+                api_endpoint="secretmanager.googleapis.com"
+            )
+        )
+
+        msg = ("✅ [MAIN] Successfully initialized Google Secret Manager client.")
+        print(msg)
+        logging.info(msg)
+    
+    except Exception as e:
+        raise RuntimeError(
+            "❌ [MAIN] Failed to initialize Google Secret Manager client due to."
+            f"{e}."
+        )
+        
+# Resolve account_id from Google Secret Manager
+    try:
+        secret_account_id = (
+            f"{COMPANY}_secret_{DEPARTMENT}_tiktok_account_id_{ACCOUNT}"
+        )
+        secret_account_name = (
+            f"projects/{PROJECT}/secrets/{secret_account_id}/versions/latest"
+        )
+        
+        msg = (
+            "🔍 [MAIN] Retrieving TikTok Ads secret_account_id "
+            f"{secret_account_name} from Google Secret Manager..."
+        )
+        print(msg)
+        logging.info(msg)        
+
+        secret_account_response = google_secret_client.access_secret_version(
+            name=secret_account_name,
+            timeout=10.0,
+        )
+        account_id = secret_account_response.payload.data.decode("utf-8")
+        
+        msg = (
+            "✅ [MAIN] Successfully retrieved TikTok Ads account_id "
+            f"{account_id} from Google Secret Manager."
+        )
+        print(msg)
+        logging.info(msg)
+    
+    except Exception as e:
+        raise RuntimeError(
+            "❌ [MAIN] Failed to retrieve TikTok Ads account_id from Google Secret Manager due to "
+            f"{e}."
+        )
+
+# Resolve access_token from Google Secret Manager
+    try:
+        secret_token_id = (
+            f"{COMPANY}_secret_all_tiktok_token_access_user"
+        )
+        secret_token_name = (
+            f"projects/{PROJECT}/secrets/{secret_token_id}/versions/latest"
+        )
+        
+        msg = (
+            "🔍 [MAIN] Retrieving TikTok Ads access token with secret_token_name "
+            f"{secret_token_name} from Google Secret Manager..."
+        )
+        print(msg)
+        logging.info(msg)
+
+        secret_token_response = google_secret_client.access_secret_version(
+            name=secret_token_name
+        )
+        access_token = secret_token_response.payload.data.decode("utf-8")
+        
+        msg = ("✅ [MAIN] Successfully retrieved TikTok Ads access token from Google Secret Manager.")
+        print(msg)
+        logging.info(msg)
+    
+    except Exception as e:
+        raise RuntimeError(
+            "❌ [MAIN] Failed to retrieve TikTok Ads access token from Google Secret Manager due to "
+            f"{e}."
+        )        
+
+# Execute DAGS
+    dags_tiktok_ads(
+        access_token=access_token,
+        account_id=account_id,
+        start_date=start_date,
+        end_date=end_date
+    )
+
+# Entrypoint
 if __name__ == "__main__":
     try:
         main()
-    except Exception as e:
-        logging.error(f"❌ Update failed: {e}")
+    except Exception:
         sys.exit(1)
