@@ -14,9 +14,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY requirements/ requirements/
 
-RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir pip-tools \
-    && pip-compile requirements/base.in -o requirements/base.txt \
+RUN pip install --no-cache-dir pip-tools \
+    && pip-compile requirements/base.in \
+        --output-file requirements/base.txt \
+        --resolver=backtracking \
     && pip install --no-cache-dir -r requirements/base.txt
 
 RUN dbt --version
