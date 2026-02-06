@@ -1,14 +1,26 @@
-# Test — Backfill for Main Entrypoin
+# Backfill for TikTok Ads Main Entrypoint
 
 - Manually fetch historical Google Ads data outside predefined `MODE` window
 - Read required environment variables `COMPANY`, `PROJECT`, `DEPARTMENT`, `ACCOUNT`
 - Accept `start_date` and `end_date` from CLI
-- CLI usage example: 
+- CLI usage example for campaign insights backfill: 
 
 ```bash
-export COMPANY=my_company
-export PROJECT=my_gcp_project
-export DEPARTMENT=marketing
-export ACCOUNT=search
+$env:PROJECT ="seer-digital-ads"; 
+$env:COMPANY="kids"; 
+$env:PLATFORM="tiktok"; 
+$env:DEPARTMENT="marketing"; 
+$env:ACCOUNT="main"; 
+python -m backfill.backfill_campaign_insights --start_date=2026-01-05 --end_date=2026-01-05
+```
 
-python backfill.py --start-date 2025-12-30 --end-date 2026-01-01`
+- CLI usage example for ad insights backfill: 
+
+```bash
+$env:PROJECT ="seer-digital-ads"; 
+$env:COMPANY="kids"; 
+$env:PLATFORM="tiktok"; 
+$env:DEPARTMENT="marketing"; 
+$env:ACCOUNT="main"; 
+python -m backfill.backfill_ad_insights --start_date=2026-01-05 --end_date=2026-01-05
+```
