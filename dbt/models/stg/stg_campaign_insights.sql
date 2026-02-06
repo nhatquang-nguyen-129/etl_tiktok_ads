@@ -1,13 +1,13 @@
 {{ 
   config(
     materialized = 'ephemeral',
-    tags = ['stg', 'facebook', 'campaign']
+    tags = ['stg', 'tiktok', 'campaign']
   ) 
 }}
 
 {% set company = var('company') %}
-{% set raw_schema = company ~ '_dataset_facebook_api_raw' %}
-{% set table_prefix = company ~ '_table_facebook_' %}
+{% set raw_schema = company ~ '_dataset_tiktok_api_raw' %}
+{% set table_prefix = company ~ '_table_tiktok_' %}
 
 {% if execute %}
 
@@ -30,7 +30,7 @@ select
     cast(null as string)  as department,
     cast(null as string)  as account,
 
-    cast(null as string)  as account_id,
+    cast(null as string)  as advertiser_id,
     cast(null as string)  as campaign_id,
     cast(null as date)    as date,
 
@@ -39,9 +39,8 @@ select
     cast(null as numeric) as spend,
 
     cast(null as int64)   as result,
-    cast(null as string)  as result_type,
 
-    cast(null as int64)   as messaging_conversations_started,
+    cast(null as int64)   as engaged_view_15s,
     cast(null as int64)   as purchase,
 
     cast(null as int64)   as year,
@@ -61,7 +60,7 @@ select
     year,
     month,
 
-    account_id,
+    advertiser_id,
     campaign_id,
 
     impressions,
@@ -69,9 +68,8 @@ select
     spend,
 
     result,
-    result_type,
 
-    messaging_conversations_started,
+    engaged_view_15s,
     purchase
 
 from `{{ target.project }}.{{ raw_schema }}.{{ table_name }}`
