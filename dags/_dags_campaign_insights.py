@@ -3,9 +3,9 @@ import sys
 from pathlib import Path
 ROOT_FOLDER_LOCATION = Path(__file__).resolve().parents[2]
 sys.path.append(str(ROOT_FOLDER_LOCATION))
+sys.stdout.reconfigure(encoding="utf-8")
 
 from datetime import datetime, timedelta
-import logging
 import pandas as pd
 import time
 
@@ -16,7 +16,7 @@ from etl.transform_campaign_metadata import transform_campaign_metadata
 from etl.load_campaign_insights import load_campaign_insights
 from etl.load_campaign_metadata import load_campaign_metadata
 
-from dbt.run import dbt_facebook_ads
+from dbt.run import dbt_tiktok_ads
 
 COMPANY = os.getenv("COMPANY")
 PROJECT = os.getenv("PROJECT")
@@ -26,93 +26,85 @@ MODE = os.getenv("MODE")
 
 def dags_campaign_insights(
     *,
-    account_id: str,
+    access_token: str,
+    advertiser_id: str,
     start_date: str,
     end_date: str,
 ):
-    msg = (
-        "🔁 [DAGS] Trigger to update Facebook Ads campaign insights with account_id "
-        f"{account_id} from "
+    print(
+        "🔄 [DAGS] Trigger to update TikTok Ads campaign insights with advertiser_id "
+        f"{advertiser_id} from "
         f"{start_date} to "
         f"{end_date}..."
     )
-    print(msg)
-    logging.info(msg)
 
-# ETL for Facebook Ads campaign insights
-    DAGS_MAX_ATTEMPTS = 3
-    DAGS_MIN_COOLDOWN = 60
+# ETL for TikTok Ads campaign insights
+    DAGS_INSIGHTS_ATTEMPTS = 3
+    DAGS_INSIGHTS_COOLDOWN = 60
 
     dags_start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
-    dags_end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+    dags_end_date   = datetime.strptime(end_date, "%Y-%m-%d").date()
 
     total_campaign_ids: set[str] = set()
 
     while dags_start_date <= dags_end_date:
         dags_split_date = dags_start_date.strftime("%Y-%m-%d")
 
-        for attempt in range(1, DAGS_MAX_ATTEMPTS + 1):
+        for attempt in range(1, DAGS_INSIGHTS_ATTEMPTS + 1):
+
+    # Extract            
             try:
-    
-    # Extract
-                msg = (
-                    "🔁 [DAGS] Trigger to extract Facebook Ads campaign insights from account_id "
-                    f"{account_id} at "
+                print(
+                    "🔄 [DAGS] Trigger to extract TikTok Ads campaign insights from advertiser_id "
+                    f"{advertiser_id} at "
                     f"{dags_split_date} for "
-                    f"{attempt} attempt(s)..."
+                    f"{attempt}/{DAGS_INSIGHTS_ATTEMPTS} attempts..."
                 )
-                print(msg)
-                logging.info(msg)
 
                 insights = extract_campaign_insights(
-                    account_id=account_id,
+                    access_token=access_token,
+                    advertiser_id=advertiser_id,
                     start_date=dags_split_date,
                     end_date=dags_split_date,
                 )
 
                 if insights.empty:
-                    msg = (
-                        "⚠️ [DAGS] No Facebook Ads campaign insights returned from account_id "
-                        f"{account_id} then DAG execution "
+                    print(
+                        "⚠️ [DAGS] No TikTok Ads campaign insights returned from advertiser_id "
+                        f"{advertiser_id} then DAG execution "
                         f"{dags_split_date} will be skipped."
                     )
-                    print(msg)
-                    logging.warning(msg)
                     break
 
     # Transform
-                msg = (
-                    "🔁 [DAGS] Trigger to transform Facebook Ads campaign insights from "
-                    f"{account_id} with "
+                print(
+                    "🔄 [DAGS] Trigger to transform TikTok Ads campaign insights from advertiser_id "
+                    f"{advertiser_id} with "
                     f"{dags_split_date} for "
                     f"{len(insights)} row(s)..."
                 )
-                print(msg)
-                logging.info(msg)                
-                
+
                 insights = transform_campaign_insights(insights)
 
     # Load
-                dags_split_year = pd.to_datetime(insights["date"].dropna().iloc[0]).year
-                dags_split_month = pd.to_datetime(insights["date"].dropna().iloc[0]).month
+                year  = pd.to_datetime(insights["date"].iloc[0]).year
+                month = pd.to_datetime(insights["date"].iloc[0]).month
+
+                daily_campaign_ids = set(insights["campaign_id"].dropna().unique())
+                total_campaign_ids.update(daily_campaign_ids)
 
                 _campaign_insights_direction = (
                     f"{PROJECT}."
-                    f"{COMPANY}_dataset_facebook_api_raw."
-                    f"{COMPANY}_table_facebook_{DEPARTMENT}_{ACCOUNT}_campaign_m{dags_split_month:02d}{dags_split_year}"
-                )
+                    f"{COMPANY}_dataset_tiktok_api_raw."
+                    f"{COMPANY}_table_tiktok_{DEPARTMENT}_{ACCOUNT}_campaign_m{month:02d}{year}"
+                )              
 
-                msg = (
-                    "🔁 [DAGS] Trigger to load Facebook Ads campaign insights from account_id "
-                    f"{account_id} for "
+                print(
+                    "🔄 [DAGS] Trigger to load TikTok Ads campaign insights from advertiser_id "
+                    f"{advertiser_id} for "
                     f"{dags_split_date} to direction "
                     f"{_campaign_insights_direction}..."
                 )
-                print(msg)
-                logging.info(msg)
-
-                daily_campaign_ids = set(insights["campaign_id"].unique())
-                total_campaign_ids.update(daily_campaign_ids)
 
                 load_campaign_insights(
                     df=insights,
@@ -123,106 +115,136 @@ def dags_campaign_insights(
 
             except Exception as e:
                 retryable = getattr(e, "retryable", False)
-                msg = (
-                    f"⚠️ [DAGS] Failed to extract Facebook Ads campaign insights for {dags_split_date} in "
-                    f"{attempt}/{DAGS_MAX_ATTEMPTS} attempt(s) due to "
+                print(
+                    "⚠️ [DAGS] Failed to extract TikTok Ads campaign insights for "
+                    f"{dags_split_date} in "
+                    f"{attempt}/{DAGS_INSIGHTS_ATTEMPTS} attempts due to "
                     f"{e}."
                 )
-                print(msg)
-                logging.warning(msg)
 
                 if not retryable:
                     raise RuntimeError(
-                        f"❌ [DAGS] Failed to extract Facebook Ads campaign insights for "
+                        "❌ [DAGS] Failed to extract TikTok Ads campaign insights for "
                         f"{dags_split_date} due to unexpected error then DAG execution will be aborting."
                     ) from e
 
-                if attempt == DAGS_MAX_ATTEMPTS:
+                if attempt == DAGS_INSIGHTS_ATTEMPTS:
                     raise RuntimeError(
-                        "❌ [DAGS] Failed to extract Facebook Ads campaign insights for "
+                        "❌ [DAGS] Failed to extract TikTok Ads campaign insights for "
                         f"{dags_split_date} in "
-                        f"{attempt}/{DAGS_MAX_ATTEMPTS} attempt(s) due to exceeded attempt limit then DAG execution will be aborting."
+                        f"{attempt}/{DAGS_INSIGHTS_ATTEMPTS} attempts due to exceeded attempt limit then DAG execution will be aborting."
                     ) from e
 
-                wait_to_retry = 2 ** attempt
+                wait_to_retry = 60 + (attempt - 1) * 30
                 
-                msg = (
-                    "🔁 [DAGS] Waiting "
-                    f"{wait_to_retry} second(s) before retrying Facebook Ads API "
-                    f"{attempt}/{DAGS_MAX_ATTEMPTS} attempt(s)..."
+                print(
+                    "🔄 [DAGS] Waiting "
+                    f"{wait_to_retry} second(s) before retrying TikTok Ads API "
+                    f"{attempt}/{DAGS_INSIGHTS_ATTEMPTS} attempts..."
                 )
-                print(msg)
-                logging.warning(msg)
 
                 time.sleep(wait_to_retry)
 
         dags_start_date += timedelta(days=1)
         
         if dags_start_date <= dags_end_date:
-            msg = (
-                "🔁 [DAGS] Waiting "
-                f"{DAGS_MIN_COOLDOWN} second(s) cooldown before processing next date of Facebook Ads campaign insights..."
+            print(
+                "🔄 [DAGS] Waiting "
+                f"{DAGS_INSIGHTS_COOLDOWN} second(s) cooldown before processing next date of TikTok Ads campaign insights..."
             )
-            print(msg)
-            logging.info(msg)
 
-            time.sleep(DAGS_MIN_COOLDOWN)
+            time.sleep(DAGS_INSIGHTS_COOLDOWN)
 
-# ETL for Facebook Ads campaign metadata
+# ETL for TikTok Ads campaign metadata
+    DAGS_CAMPAIGN_ATTEMPTS = 3
+
     if not total_campaign_ids:
-        msg = (
-            "⚠️ [DAGS] No Facebook Ads campaign_id appended for account_id "
-            f"{account_id} from "
+        print(
+            "⚠️ [DAGS] No TikTok Ads campaign_id appended for advertiser_id "
+            f"{advertiser_id} from "
             f"{start_date} to "
             f"{end_date} then DAG execution will be suspended."
         )
-        print(msg)
-        logging.warning(msg)
         return
+    
+    remaining_campaign_ids = list(total_campaign_ids)
+    dfs_campaign_metadata = []
+
+    for attempt in range(1, DAGS_CAMPAIGN_ATTEMPTS + 1):
+        print(
+            "🔄 [DAGS] Trigger to extract TikTok Ads campaign metadata for "
+            f"{len(remaining_campaign_ids)} campaign_id(s) in "
+            f"{attempt}/{DAGS_CAMPAIGN_ATTEMPTS} attempt(s)..."
+        )
 
     # Extract
-    msg = (
-        "🔁 [DAGS] Trigger to transform Facebook Ads campaign metadata for "
-        f"{len(total_campaign_ids)} campaign_id(s)..."
-    )
-    print(msg)
-    logging.info(msg)
+        df_campaign_metadata = extract_campaign_metadata(
+            access_token=access_token,
+            advertiser_id=advertiser_id,
+            campaign_ids=remaining_campaign_ids,
+        )
 
-    df_campaign_metadatas = extract_campaign_metadata(
-        account_id=account_id,
-        campaign_id_list=list(total_campaign_ids),
-    )
+        if not df_campaign_metadata.empty:
+            dfs_campaign_metadata.append(df_campaign_metadata)
 
-    if df_campaign_metadatas.empty:
-        msg = "⚠️ [DAGS] Empty Facebook Ads campaign metadata extracted then DAG execution will be suspended."
-        print(msg)
-        logging.warning(msg)
-        return
+        failed_campaign_ids = getattr(df_campaign_metadata, "failed_campaign_ids", [])
+        retryable = getattr(df_campaign_metadata, "retryable", False)
+
+        if not failed_campaign_ids:
+            print(
+                "✅ [DAGS] Successfully triggered to extract TikTok Ads campaign metadata with "
+                f"{len(set(pd.concat(dfs_campaign_metadata)["campaign_id"].dropna()))}/{len(remaining_campaign_ids)} row(s)."
+            )
+            break
+
+        if not retryable:
+            print(
+                "❌ [DAGS] Failed to extract TikTok Ads campaign metadata for "
+                f"{len(remaining_campaign_ids)} campaign_id(s) due to unexpected non-retryable error then DAG execution will be suspended."
+            )
+            break
+
+        if attempt == DAGS_CAMPAIGN_ATTEMPTS:
+            print(
+                "❌ [DAGS] Failed to extract TikTok Ads campaign metadata for "
+                f"{len(remaining_campaign_ids)} campaign_id(s) due to exceeded attempt limit then DAG execution will be suspended."
+            )
+            break
+
+        remaining_campaign_ids = failed_campaign_ids
+
+        wait_to_retry = 60 + (attempt - 1) * 30
+        
+        print(
+            "🔄 [DAGS] Waiting "
+            f"{wait_to_retry} second(s) before retrying TikTok Ads API "
+                f"{attempt}/{DAGS_CAMPAIGN_ATTEMPTS} attempt(s)..."
+            )
+        
+        time.sleep(wait_to_retry)
+
+    df_campaign_metadatas = pd.concat(dfs_campaign_metadata, ignore_index=True)
 
     # Transform
-    msg = (
-        "🔁 [DAGS] Trigger to transform Facebook Ads campaign metadata for "
-        f"{len(total_campaign_ids)} campaign_id(s)..."
+    print(
+        "🔄 [DAGS] Trigger to transform TikTok Ads campaign metadata for "
+        f"{len(df_campaign_metadatas)} row(s)..."
     )
-    print(msg)
-    logging.info(msg)
 
     df_campaign_metadatas = transform_campaign_metadata(df_campaign_metadatas)
 
     # Load
     _campaign_metadata_direction = (
         f"{PROJECT}."
-        f"{COMPANY}_dataset_facebook_api_raw."
-        f"{COMPANY}_table_facebook_{DEPARTMENT}_{ACCOUNT}_campaign_metadata"
-    )
+        f"{COMPANY}_dataset_tiktok_api_raw."
+        f"{COMPANY}_table_tiktok_{DEPARTMENT}_{ACCOUNT}_campaign_metadata"
+    )  
 
-    msg = (
-        "🔁 [DAGS] Trigger to load Facebook Ads campaign metadata for "
-        f"{len(df_campaign_metadatas)} row(s) to "
-        f"{_campaign_metadata_direction}..."
+    print(
+        "🔄 [DAGS] Trigger to load TikTok Ads campaign metadata for "
+        f"{len(df_campaign_metadatas)} row(s) to"
+        f"{_campaign_metadata_direction}..."       
     )
-    print(msg)
-    logging.info(msg)
 
     load_campaign_metadata(
         df=df_campaign_metadatas,
@@ -230,11 +252,9 @@ def dags_campaign_insights(
     )
 
 # Materialization with dbt
-    msg = ("🔁 [DAGS] Trigger to materialize Facebook Ads campaign insights with dbt...")
-    print(msg)
-    logging.info(msg)
-
-    dbt_facebook_ads(
+    print("🔄 [DAGS] Trigger to materialize TikTok Ads campaign insights with dbt...")
+    
+    dbt_tiktok_ads(
         google_cloud_project=PROJECT,
-        level="campaign",
+        select="tag:mart,tag:campaign",
     )
