@@ -44,10 +44,10 @@ def load_campaign_metadata(
         mode="upsert",
         keys=[
             "advertiser_id", 
-            "ad_id"
+            "campaign_id"
         ],
         partition=None,
         cluster=[
-            "ad_id"
+            "campaign_id"
         ],
     )
