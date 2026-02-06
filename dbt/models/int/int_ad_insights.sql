@@ -16,8 +16,8 @@ select
     ad.ad_name,
 
     case
-        when ad.operation_status = 'ENABLE'                 then '🟢'
-        when ad.operation_status = 'DISABLE'                then '⚪'
+        when ad.operation_status = 'ACTIVE'                 then '🟢'
+        when ad.operation_status = 'PAUSED'                then '⚪'
         when ad.operation_status in ('ARCHIVED','DELETED')  then '🔴'
         else '❓'
     end as ad_status,

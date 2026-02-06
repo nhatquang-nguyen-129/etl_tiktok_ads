@@ -1,12 +1,12 @@
 {{ 
   config(
-    alias = var('company') ~ '_table_facebook_all_all_ad_performance',
+    alias = var('company') ~ '_table_tiktok_all_all_ad_performance',
     partition_by = {
       "field": "date",
       "data_type": "date"
     },
-    cluster_by = ["account_id", "ad_id"],
-    tags = ['mart', 'facebook', 'ad']
+    cluster_by = ["advertiser_id", "ad_id"],
+    tags = ['mart', 'tiktok', 'ad']
   ) 
 }}
 
@@ -18,22 +18,22 @@ select
     department,
     account,
 
-    account_id,
+    advertiser_id,
     campaign_id,
-    adset_id,
+    adgroup_id,
     ad_id,
 
     ad_name,
     ad_status,
-    thumbnail_url,
+    video_cover_url,
 
     impressions,
     clicks,
     spend,
 
     result,
-    result_type,
-    messaging_conversations_started,
+    optimization_event,
+    engaged_view_15s,
     purchase,
 
     campaign_name,
