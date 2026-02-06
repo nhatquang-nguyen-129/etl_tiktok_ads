@@ -30,12 +30,10 @@ def extract_ad_creative(
     retryable = True
 
     # Make TikTok Ads API v1.3 call for ad creative
-    msg = (
+    print(
         "🔍 [EXTRACT] Extracting TikTok Ads ad creative for advertiser_id "
         f"{advertiser_id}..."
     )
-    print(msg)
-    logging.info(msg)
 
     headers = {
         "Access-Token": access_token,
