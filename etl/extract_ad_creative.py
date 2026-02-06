@@ -4,13 +4,12 @@ ROOT_FOLDER_LOCATION = Path(__file__).resolve().parents[2]
 sys.path.append(str(ROOT_FOLDER_LOCATION))
 
 import time
-import logging
 import requests
 import pandas as pd
 
 def extract_ad_creative(
-    advertiser_id: str,
     access_token: str,
+    advertiser_id: str,   
 ) -> pd.DataFrame:
     """
     Extract TikTok Ads ad creative
@@ -40,7 +39,7 @@ def extract_ad_creative(
         "Content-Type": "application/json",
     }
 
-    video_url = "https://business-api.tiktok.com/open_api/v1.3/file/video/ad/search/"
+    url = "https://business-api.tiktok.com/open_api/v1.3/file/video/ad/search/"
 
     page = 1
     page_size = 100
@@ -55,7 +54,7 @@ def extract_ad_creative(
             }
 
             resp = requests.get(
-                video_url,
+                url,
                 headers=headers,
                 json=payload,
             )
@@ -116,13 +115,11 @@ def extract_ad_creative(
             pagination_continue = page < total_page
             page += 1
 
-        msg = (
+        print(
             "✅ [EXTRACT] Successfully extracted TikTok Ads ad creative for advertiser_id "
             f"{advertiser_id} with "
             f"{len(rows)} record(s)."           
         )
-        print(msg)
-        logging.info(msg)
 
     except requests.HTTPError as e:
         status = e.response.status_code if e.response else None
