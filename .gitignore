@@ -20,6 +20,8 @@ requirements/*.txt
 auth/oauth2_desktop_client.json
 
 # dbt artifacts
+logs/
+target/
 dbt/target/
 dbt/logs/
 dbt/dbt_packages/
