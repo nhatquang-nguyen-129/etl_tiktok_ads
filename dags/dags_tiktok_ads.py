@@ -1,109 +1,73 @@
 import sys
+import time
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
 ROOT_FOLDER_LOCATION = Path(__file__).resolve().parents[2]
 sys.path.append(str(ROOT_FOLDER_LOCATION))
-
-from concurrent.futures import ThreadPoolExecutor, as_completed
-import logging
-import time
 
 from dags._dags_campaign_insights import dags_campaign_insights
 from dags._dags_ad_insights import dags_ad_insights
 
-
 def dags_tiktok_ads(
     *,
-    account_id: str,
+    access_token: str,
+    advertiser_id: str,
     start_date: str,
     end_date: str,
     max_workers: int = 2,
 ):
-
-    msg = (
-        "🔁 [DAGS] Triggering to update Facebook Ads for account_id "
-        f"{account_id} from "
-        f"{start_date} to "
-        f"{end_date} using ThreadPoolExecutor with "
-        f"{max_workers} max_workers..."
+    print(
+        f"🔄 [DAGS] Trigger TikTok Ads DAGs for {advertiser_id} "
+        f"from {start_date} → {end_date} | workers={max_workers}"
     )
-    print(msg)
-    logging.info(msg)
 
     tasks = {
         "campaign_insights": dags_campaign_insights,
         "ad_insights": dags_ad_insights,
     }
 
-    exceptions = []
     start_time = time.time()
+    futures = {}
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        future_map = {}
-
-        for name, task in tasks.items():
-            msg = (
-                "🔍 [DAGS] Submitting Facebook Ads ThreadPoolExecutor task "
-                f"{name}..."
-            )
-            print(msg)
-            logging.info(msg)
-
+        # submit ALL tasks
+        for name, fn in tasks.items():
+            print(f"▶️  [DAGS:{name}] RUNNING")
             future = executor.submit(
-                task,
-                account_id=account_id,
+                fn,
+                access_token=access_token,
+                advertiser_id=advertiser_id,
                 start_date=start_date,
                 end_date=end_date,
             )
-            future_map[future] = name
+            futures[future] = name
 
-        msg = (
-            "🔍 [DAGS] Waiting for Facebook Ads ThreadPoolExecutor "
-            f"{len(future_map)} task(s) to complete..."
-        )
-        print(msg)
-        logging.info(msg)
+        completed = set()
 
-        for future in as_completed(future_map):
-            task_name = future_map[future]
-            
-            msg = (
-                "🔍 [DAGS] Getting result from Facebook Ads ThreadPoolExecutor task "
-                f"{task_name}..."
-            )
-            print(msg)
-            logging.info(msg)
+        for future in as_completed(futures):
+            name = futures[future]
+            completed.add(name)
+
+            print("\n" + "=" * 120)
+            print(f"[DAGS] TASK FINISHED: {name}")
+            print("=" * 120)
 
             try:
                 future.result()
-                msg = (
-                    "✅ [DAGS] Successfully complete Facebook Ads ThreadPoolExecutor task "
-                    f"{task_name}..."
-                )
-                print(msg)
-                logging.info(msg)
-
+                print(f"✅ [DAGS:{name}] COMPLETED")
             except Exception as e:
-                msg = (
-                    "❌ [DAGS] Failed to complete Facebook Ads ThreadPoolExecutor task "
-                    f"{task_name} due to {e}."
-                )
-                print(msg)
-                logging.error(msg)
-                exceptions.append((task_name, e))
+                print(f"❌ [DAGS:{name}] FAILED")
+                print(str(e))
 
-    elapsed = round(time.time() - start_time, 2)
+            print("=" * 120)
 
-    if exceptions:
-        failed_tasks = ", ".join(name for name, _ in exceptions)
-        raise RuntimeError(
-            "❌ [DAGS] Failed to update Facebook Ads using ThreadPoolExecutor with"
-            f"{failed_tasks} failed task(s) in "
-            f"{elapsed}s elapsed time."
-        )
+            remaining = [n for n in tasks if n not in completed]
+            if remaining:
+                print("\n⏳ Still running:")
+                for r in remaining:
+                    print(f"   ▶️  [DAGS:{r}] RUNNING")
+                print()
 
-    msg = (
-        "✅ [DAGS] Successfully updated Facebook Ads using ThreadPoolExecutr in "
-        f"{elapsed}s elapsed time."
-    )
-    print(msg)
-    logging.info(msg)
+    total_elapsed = round(time.time() - start_time, 2)
+    print(f"🏁 [DAGS] TikTok Ads update finished in {total_elapsed}s")

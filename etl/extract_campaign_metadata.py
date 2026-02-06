@@ -109,7 +109,7 @@ def extract_campaign_metadata(
                 f"{code} then this request is not eligible to retry."
             )
 
-        advertiser_name = data["data"]["list"][0].get("advertiser_name")
+        advertiser_name = data["data"]["list"][0].get("name")
 
         print(
             "✅ [EXTRACT] Successfully extracted TikTok Ads advertiser_name "
@@ -154,7 +154,6 @@ def extract_campaign_metadata(
         "operation_status",
         "objective_type",
         "advertiser_id",
-        "advertiser_name",
     ]
 
     print(
