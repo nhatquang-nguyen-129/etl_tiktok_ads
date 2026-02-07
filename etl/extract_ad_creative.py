@@ -42,6 +42,11 @@ def extract_ad_creative(
     page_size = 100
     pagination_continue = True
 
+    timeout = (
+        10, 
+        600
+    )
+
     try:
         print(
             "🔍 [EXTRACT] Extracting TikTok Ads ad creative for advertiser_id "
@@ -59,6 +64,7 @@ def extract_ad_creative(
                 video_url,
                 headers=headers,
                 json=payload,
+                timeout=timeout,
             )
             resp.raise_for_status()
             data = resp.json()
