@@ -30,14 +30,19 @@ def extract_ad_insights(
 
     start_time = time.time()
 
-    # Make TikTok Ads API v1.3 call for ad insights
-    ad_insights_url = "https://business-api.tiktok.com/open_api/v1.3/report/integrated/get/"
-    
     headers = {
         "Access-Token": access_token,
         "Content-Type": "application/json"
     }
 
+    timeout = (
+        10,
+        600
+    )
+
+    # Make TikTok Ads API v1.3 call for ad insights
+    ad_insights_url = "https://business-api.tiktok.com/open_api/v1.3/report/integrated/get/"
+    
     dimensions = [
         "ad_id",
         "stat_time_day",
@@ -68,11 +73,6 @@ def extract_ad_insights(
         "page_size": 1000,
         "page": 1
     }
-
-    timeout = (
-        10,
-        600
-    )
 
     records = []
 
