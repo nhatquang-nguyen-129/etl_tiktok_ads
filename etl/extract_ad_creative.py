@@ -158,7 +158,7 @@ def extract_ad_creative(
         ) from e
 
     df = pd.DataFrame(rows)
-    df.attrs("retryable") = retryable
+    df.attrs["retryable"] = retryable
     df.attrs["time_elapsed"] = round(time.time() - start_time, 2)
     df.attrs["rows_input"] = None
     df.attrs["rows_output"] = len(df)
