@@ -30,12 +30,18 @@ def extract_campaign_insights(
 
     start_time = time.time()
 
-    campaign_insights_url = "https://business-api.tiktok.com/open_api/v1.3/report/integrated/get/"
-    
     headers = {
         "Access-Token": access_token,
         "Content-Type": "application/json"
     }
+
+    timeout =(
+        10,
+        600
+    )
+    
+    # Make TikTok Ads API v1.3 call for campaign insights
+    campaign_insights_url = "https://business-api.tiktok.com/open_api/v1.3/report/integrated/get/"   
 
     dimensions = [
         "campaign_id",
@@ -70,7 +76,6 @@ def extract_campaign_insights(
 
     records = []
 
-    # Make TikTok Ads API v1.3 call for campaign insights
     try:
         print(
             "🔍 [EXTRACT] Extracting TikTok Ads campaign insights for advertiser_id "
@@ -84,7 +89,7 @@ def extract_campaign_insights(
                 campaign_insights_url,
                 headers=headers,
                 json=payload,
-                timeout=60
+                timeout=timeout,
             )
             resp.raise_for_status()
             data = resp.json()
@@ -150,10 +155,10 @@ def extract_campaign_insights(
             rows.append(row)
 
         df = pd.DataFrame(rows)
-        df.retryable = False
-        df.time_elapsed = round(time.time() - start_time, 2)
-        df.rows_input = None
-        df.rows_output = len(df)
+        df.attrs("retryable") = False
+        df.attrs("time_elapsed") = round(time.time() - start_time, 2)
+        df.attrs("rows_input") = None
+        df.attrs("rows_output") = len(df)
 
         return df
 
