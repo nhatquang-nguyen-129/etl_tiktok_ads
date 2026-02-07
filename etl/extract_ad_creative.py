@@ -30,22 +30,22 @@ def extract_ad_creative(
     rows: list[dict] = []
     retryable = True
 
-    # Make TikTok Ads API v1.3 call for ad creative
     headers = {
         "Access-Token": access_token,
         "Content-Type": "application/json",
     }
 
+    timeout = (
+        10, 
+        600
+    )
+
+    # Make TikTok Ads API v1.3 call for ad creative
     video_url = "https://business-api.tiktok.com/open_api/v1.3/file/video/ad/search/"
 
     page = 1
     page_size = 100
     pagination_continue = True
-
-    timeout = (
-        10, 
-        600
-    )
 
     try:
         print(
