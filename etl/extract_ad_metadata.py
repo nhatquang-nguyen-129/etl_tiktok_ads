@@ -32,6 +32,16 @@ def extract_ad_metadata(
     failed_ad_ids: list[str] = []
     retryable = True
 
+    headers = {
+        "Access-Token": access_token,
+        "Content-Type": "application/json",
+    }
+
+    timeout =(
+        10,
+        600
+    )
+
     # Validate input
     if not ad_ids:
         df = pd.DataFrame(
@@ -50,19 +60,14 @@ def extract_ad_metadata(
                 "video_id",
             ]
         )
-        df.failed_ad_ids = []
-        df.retryable = False
-        df.time_elapsed = round(time.time() - start_time, 2)
-        df.rows_input = 0
-        df.rows_output = 0
+        df.attrs("failed_ad_ids") = []
+        df.attrs("retryable") = False
+        df.attrs("time_elapsed") = round(time.time() - start_time, 2)
+        df.attrs("rows_input") = 0
+        df.attrs("rows_output") = 0
         return df
 
     # Make TikTok Ads API v1.3 call for advertiser name
-    headers = {
-        "Access-Token": access_token,
-        "Content-Type": "application/json",
-    }
-
     try:
         print(
             "🔍 [EXTRACT] Extracting TikTok Ads advertiser_name for advertiser_id "
@@ -76,6 +81,7 @@ def extract_ad_metadata(
             advertiser_url,
             headers=headers,
             json=advertiser_payload,
+            timeout=timeout,
         )
         resp.raise_for_status()
         data = resp.json()
@@ -186,6 +192,7 @@ def extract_ad_metadata(
                 ad_metadata_url,
                 headers=headers,
                 json=payload,
+                timeout=timeout,
             )
             resp.raise_for_status()
             data = resp.json()
@@ -337,10 +344,10 @@ def extract_ad_metadata(
             ) from e
 
     df = pd.DataFrame(rows)
-    df.failed_ad_ids = failed_ad_ids
-    df.retryable = bool(failed_ad_ids) and retryable
-    df.time_elapsed = round(time.time() - start_time, 2)
-    df.rows_input = len(ad_ids)
-    df.rows_output = len(df)
+    df.attrs("failed_ad_ids") = failed_ad_ids
+    df.attrs("retryable") = bool(failed_ad_ids) and retryable
+    df.attrs("time_elapsed") = round(time.time() - start_time, 2)
+    df.attrs("rows_input") = len(ad_ids)
+    df.attrs("rows_output") = len(df)
 
     return df
