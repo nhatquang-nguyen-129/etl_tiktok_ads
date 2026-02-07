@@ -69,6 +69,11 @@ def extract_ad_insights(
         "page": 1
     }
 
+    timeout = (
+        10,
+        600
+    )
+
     records = []
 
     try:
@@ -84,7 +89,7 @@ def extract_ad_insights(
                 ad_insights_url,
                 headers=headers,
                 json=payload,
-                timeout=60
+                timeout=timeout,
             )
             resp.raise_for_status()
             data = resp.json()
@@ -150,10 +155,10 @@ def extract_ad_insights(
             rows.append(row)
 
         df = pd.DataFrame(rows)
-        df.retryable = False
-        df.time_elapsed = round(time.time() - start_time, 2)
-        df.rows_input = None
-        df.rows_output = len(df)
+        df.attrs("retryable") = False
+        df.attrs("time_elapsed") = round(time.time() - start_time, 2)
+        df.attrs("rows_input") = None
+        df.attrs("rows_output") = len(df)
 
         return df
 
