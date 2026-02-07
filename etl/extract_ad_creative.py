@@ -6,19 +6,6 @@ sys.path.append(str(ROOT_FOLDER_LOCATION))
 import time
 import requests
 import pandas as pd
-from tenacity import (
-    retry,
-    stop_after_delay,
-    wait_fixed,
-    retry_if_exception_type,
-)
-
-@retry(
-    stop=stop_after_delay(600),
-    wait=wait_fixed(60),
-    retry=retry_if_exception_type(RuntimeError),
-    reraise=True,
-)
 
 def extract_ad_creative(
     access_token: str,
