@@ -50,6 +50,7 @@ def extract_campaign_metadata(
                 "campaign_id",
                 "campaign_name",
                 "operation_status",
+                "objective_type",
                 "advertiser_id",
                 "advertiser_name",
             ]
@@ -164,11 +165,11 @@ def extract_campaign_metadata(
     campaign_metadata_url = "https://business-api.tiktok.com/open_api/v1.3/campaign/get/"
     
     fields = [
+        "advertiser_id",
         "campaign_id",
         "campaign_name",
         "operation_status",
         "objective_type",
-        "advertiser_id",
     ]
 
     print(
@@ -229,6 +230,7 @@ def extract_campaign_metadata(
                             "campaign_id": campaign_id,
                             "campaign_name": None,
                             "operation_status": None,
+                            "objective_type": None,
                             "advertiser_id": advertiser_id,
                             "advertiser_name": advertiser_name,
                         }
@@ -252,6 +254,7 @@ def extract_campaign_metadata(
                         "campaign_id": campaign.get("campaign_id"),
                         "campaign_name": campaign.get("campaign_name"),
                         "operation_status": campaign.get("operation_status"),
+                        "objective_type": campaign.get("objective_type"),
                         "advertiser_id": advertiser_id,
                         "advertiser_name": advertiser_name,
                     }
@@ -262,6 +265,7 @@ def extract_campaign_metadata(
                         "campaign_id": campaign_id,
                         "campaign_name": None,
                         "operation_status": None,
+                        "objective_type": None,
                         "advertiser_id": advertiser_id,
                         "advertiser_name": advertiser_name,
                     }
