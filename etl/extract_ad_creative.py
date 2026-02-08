@@ -15,7 +15,7 @@ def extract_ad_creative(
     Extract TikTok Ads ad creative
     ---------
     Workflow:
-        1. No need input ad_ids
+        1. No need input ad_ids 
         2. No need to loop each ad_id
         3. Paginate video creative endpoint
         4. Append extracted JSON data to list[dict]
