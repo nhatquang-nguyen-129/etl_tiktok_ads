@@ -64,7 +64,7 @@ select
     adgroup_id,
     ad_id,
 
-    date,
+    DATE(date) as date,
     year,
     month,
 
