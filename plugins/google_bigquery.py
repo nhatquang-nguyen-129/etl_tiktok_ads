@@ -3,7 +3,6 @@ from pathlib import Path
 ROOT_FOLDER_LOCATION = Path(__file__).resolve().parents[2]
 sys.path.append(str(ROOT_FOLDER_LOCATION))
 
-import logging
 import pandas as pd
 import uuid
 
@@ -21,7 +20,7 @@ class internalGoogleBigqueryLoader:
         4. Check table existence
         5. Create table if not exist
         6. Apply INSERT/UPSERT DML
-        7. Writer data into table
+        7. Write data into table
     ---------
     Returns:
         None
@@ -86,12 +85,10 @@ class internalGoogleBigqueryLoader:
             return
 
         try:
-            msg = (
+            print(
                 "🔍 [PLUGIN] Initializing Google BigQuery client with direction "
                 f"{direction}..."
                 )
-            print(msg)
-            logging.info(msg)
 
             parts = direction.split(".")
             if len(parts) != 3:
@@ -104,12 +101,10 @@ class internalGoogleBigqueryLoader:
             self.project = project
             self.client = bigquery.Client(project=project)
             
-            msg = (
+            print(
                 "✅ [PLUGIN] Successfull initialized Google BigQuery client for project "
                 f"{project}."
                 )
-            print(msg)
-            logging.info(msg)
         
         except Exception as e:
             raise RuntimeError(
@@ -128,22 +123,25 @@ class internalGoogleBigqueryLoader:
         full_dataset_id = f"{project}.{dataset}"
 
         try:
-            msg = f"🔍 [PLUGIN] Validating Google BigQuery dataset {full_dataset_id} existence..."
-            print(msg)
-            logging.info(msg)
+            print(
+                "🔍 [PLUGIN] Validating Google BigQuery dataset "
+                f"{full_dataset_id} existence..."
+            ) 
 
             self.client.get_dataset(full_dataset_id)
 
-            msg = f"✅ [PLUGIN] Successfully validated Google BigQuery dataset {full_dataset_id} existence."
-            print(msg)
-            logging.info(msg)
-            
+            print(
+                "✅ [PLUGIN] Successfully validated Google BigQuery dataset "
+                f"{full_dataset_id} existence."
+            )
+
             return True
 
         except NotFound:
-            msg = f"⚠️ [PLUGIN] Google BigQuery dataset {full_dataset_id} not found then dataset creation will be proceeding..."
-            print(msg)
-            logging.warning(msg)
+            print(
+                "⚠️ [PLUGIN] Failed to find Google BigQuery dataset "
+                f"{full_dataset_id} not found then dataset creation will be proceeding..."
+            ) 
             
             return False
 
@@ -158,17 +156,19 @@ class internalGoogleBigqueryLoader:
         full_dataset_id = f"{project}.{dataset}"
         
         try:
-            msg = f"🔍 [PLUGIN] Creating Google BigQuery dataset {full_dataset_id}..."
-            print(msg)
-            logging.info(msg)
+            print(
+                "🔍 [PLUGIN] Creating Google BigQuery dataset "
+                f"{full_dataset_id}..."
+            ) 
 
             dataset_config = bigquery.Dataset(full_dataset_id)
             dataset_config.location = location
             self.client.create_dataset(dataset_config, exists_ok=True)
 
-            msg = f"✅ [PLUGIN] Successfully created Google BigQuery dataset {full_dataset_id}."
-            print(msg)
-            logging.info(msg)
+            print(
+                "✅ [PLUGIN] Successfully created Google BigQuery dataset "
+                f"{full_dataset_id}."
+            ) 
 
         except Exception as e:
             raise RuntimeError(
@@ -202,23 +202,26 @@ class internalGoogleBigqueryLoader:
             ) -> bool:
         
         try:
-            msg = f"🔍 [PLUGIN] Validating Google BigQuery table {direction} existence..."
-            print(msg)
-            logging.info(msg)            
+            print(
+                "🔍 [PLUGIN] Validating Google BigQuery table " 
+                "f{direction} existence..."
+            )
             
             self._init_client(direction)
             self.client.get_table(direction)
             
-            msg = f"✅ [PLUGIN] Successfully validated Google BigQuery table {direction} existence."
-            print(msg)
-            logging.info(msg)
+            print(
+                "✅ [PLUGIN] Successfully validated Google BigQuery table " 
+                f"{direction} existence."
+            ) 
 
             return True
 
         except NotFound:
-            msg = f"⚠️ [PLUGIN] Google BigQuery table {direction} not found then table creation will be proceeding..."
-            print(msg)
-            logging.warning(msg)
+            print(
+                "⚠️ [PLUGIN] Google BigQuery table "
+                f"{direction} not found then table creation will be proceeding..."
+            ) 
             
             return False
 
@@ -233,14 +236,12 @@ class internalGoogleBigqueryLoader:
     ) -> None:
         
         try:
-            msg = (
+            print(
                 "🔍 [PLUGIN] Creating Google BigQuery table "
                 f"{direction} with partition on "
                 f"{partition} and cluster on "
                 f"{cluster}..."
             )
-            print(msg)
-            logging.info(msg)
 
             table = bigquery.Table(
                 direction,
@@ -257,11 +258,10 @@ class internalGoogleBigqueryLoader:
                 table.clustering_fields = cluster
 
             self.client.create_table(table)
-            msg = (
+            
+            print(
                 "✅ [PLUGIN] Successfully created Google BigQuery table "
                 f"{direction}.")
-            print(msg)
-            logging.info(msg)
         
         except Exception as e:
             raise RuntimeError(
@@ -282,22 +282,18 @@ class internalGoogleBigqueryLoader:
     ) -> None:
 
         if mode == "insert":
-            msg = (
+            print(
                 "⚠️ [PLUGIN] Applied INSERT upload mode for conflict handling then existing records deletion in Google BigQuery table "
                 f"{direction} will be skipped."
             )
-            print(msg)
-            logging.warning(msg)
             return
 
         if mode == "upsert":
             if table_exists is False:
-                msg = (
+                print(
                     "⚠️ [PLUGIN] Applied UPSERT upload mode for conflict handling for new Google BigQuery table "
                     f"{direction} then existing records deletion will be skipped. "
                 )
-                print(msg)
-                logging.warning(msg)
                 return
 
             if not keys:
@@ -306,26 +302,25 @@ class internalGoogleBigqueryLoader:
                     f"{direction}."
                 )
 
-            msg = (
+            print(
                 "🔄 [PLUGIN] Applying UPSERT for Google BigQuery table "
                 f"{direction} with  "
                 f"{keys} key(s)..."
             )
-            print(msg)
-            logging.info(msg)
 
             missing = [k for k in keys if k not in df.columns]
             if missing:
-                raise ValueError(f"❌ [PLUGIN] Failed to validate deduplication keys in DataFrame due to {missing} missing key(s).")
+                raise ValueError(
+                    "❌ [PLUGIN] Failed to validate deduplication keys in DataFrame due to "
+                    f"{missing} missing key(s)."
+                )
 
             df_to_delete = df[keys].dropna().drop_duplicates()
             if df_to_delete.empty:
-                msg = (
-                    f"⚠️ [PLUGIN] Applied UPSERT conflict handling but no keys found in DataFrame then existing records in Google BigQuery table "
+                print(
+                    "⚠️ [PLUGIN] Applied UPSERT conflict handling but no keys found in DataFrame then existing records in Google BigQuery table "
                     f"{direction} will be skipped."
                 )
-                print(msg)
-                logging.warning(msg)
                 return
 
             # Single delete using parameterized query
@@ -370,20 +365,16 @@ class internalGoogleBigqueryLoader:
                 existing_values = [row[key] for row in job_check_exist.result()]
 
                 if not existing_values:
-                    msg = (
+                    print(
                         "⚠️ [PLUGIN] Applied UPSERT conflict handling but no matching keys found in Google BigQuery table "
                         f"{direction} then existing records deletion via parameterized query will be skipped."
                     )
-                    print(msg)
-                    logging.warning(msg)
                     return
 
-                msg = (
+                print(
                     "🔍 [PLUGIN] Deleting existing row(s) in Google BigQuery table "
                     f"{direction}..."
                 )
-                print(msg)
-                logging.info(msg)
                 
                 query_delete_exist = f"""
                 DELETE FROM `{direction}`
@@ -404,16 +395,14 @@ class internalGoogleBigqueryLoader:
                 job_delete_exist.result()
                 deleted_rows = job_delete_exist.num_dml_affected_rows or 0
 
-                msg = (
+                print(
                     "✅ [PLUGIN] Successfully deleted "
                     f"{deleted_rows} row(s) in Google BigQuery table"
                     f"{direction} using parameterized query with "
                     f"{key} key to delete."
                     
                 )
-                print(msg)
-                logging.info(msg)
-                
+
                 return
 
             # Batch delete using temporary table
@@ -460,15 +449,13 @@ class internalGoogleBigqueryLoader:
             existing_count = existing_rows[0]["cnt"] if existing_rows else 0
 
             if existing_count == 0:
-                msg = (
+                print(
                     "⚠️ [PLUGIN] Applied UPSERT conflict handling but no matching composite keys found in Google BigQuery table "
                     f"{direction} then existing rows deletion via temporary table will be skipped."
                 )
-                print(msg)
-                logging.warning(msg)
                 return
             
-            msg = (
+            print(
                 "🔍 [PLUGIN] Deleting "
                 f"{existing_count} existing row(s) in Google BigQuery table..."
                 f"{direction}..."
@@ -487,33 +474,27 @@ class internalGoogleBigqueryLoader:
                 )
                 deleted_rows = job_delete_exist.result().num_dml_affected_rows or 0
 
-                msg = (
+                print(
                     "✅ [PLUGIN] Successfully deleted "
                     f"{deleted_rows}/{existing_count} row(s) in Google BigQuery table "
                     f"{direction} using temporary table contains "
                     f"{keys} keys to delete."
                 )
-                print(msg)
-                logging.info(msg)
 
             finally:
                 
                 try:
-                    msg = (
-                        "🔁 [PLUGIN] Deleting temporary table "
+                    print(
+                        "🔄 [PLUGIN] Deleting temporary table "
                         f"{temp_table}..."
-                    )
-                    print(msg)
-                    logging.info(msg)                    
+                    )                 
                     
                     self.client.query(f"DROP TABLE `{temp_table}`").result()
                     
-                    msg = (
+                    print(
                         "✅ [PLUGIN] Successfully deleted temporary table "
                         f"{temp_table}."
                     )
-                    print(msg)
-                    logging.info(msg)
                 
                 except Exception as e:
                     raise RuntimeError (
@@ -539,12 +520,10 @@ class internalGoogleBigqueryLoader:
     ) -> None:
         
         try:
-            msg = (
+            print(
                 "🔍 [PLUGIN] Writing data into Google BigQuery table "
                 f"{direction} using default WRITE_APPEND mode..."
             )
-            print(msg)
-            logging.info(msg)
 
             job = self.client.load_table_from_dataframe(
                 df,
@@ -556,13 +535,11 @@ class internalGoogleBigqueryLoader:
             job.result()
             written_rows = job.output_rows or 0
 
-            msg = (
+            print(
                 "✅ [PLUGIN] Successfully written "
                 f"{written_rows}/{len(df)} row(s) to Google BigQuery table "
                 f"{direction} direction with WRITE_APPEND mode."
             )
-            print(msg)
-            logging.info(msg)
 
         except Exception as e:
             raise RuntimeError(
