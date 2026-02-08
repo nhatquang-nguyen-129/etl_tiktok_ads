@@ -34,7 +34,7 @@ select
             ) then '🔴'
 
         else '❓'
-    end as ad_status
+    end as ad_status,
 
     ad.location,
     ad.gender,
