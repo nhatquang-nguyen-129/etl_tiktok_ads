@@ -64,7 +64,7 @@ def extract_campaign_metadata(
             "⚠️ [EXTRACT] Completely extracted TikTok Ads campaign metadata for advertiser_id "
             f"{advertiser_id} but returned "
             f"{df.attrs['rows_output']} row(s) due to "
-            f"{df.attrs['rows_output']} input ad_id in "
+            f"{df.attrs['rows_output']} input campaign_id in "
             f"{df.attrs['time_elapsed']}s."
         )        
 
@@ -314,5 +314,24 @@ def extract_campaign_metadata(
     df.attrs["time_elapsed"] = round(time.time() - start_time, 2)
     df.attrs["rows_input"] = len(campaign_ids)
     df.attrs["rows_output"] = len(df)
+
+    if df.attrs["rows_output"] < df.attrs["rows_input"]:
+        print(
+            "⚠️ [EXTRACT] Partially extracted TikTok Ads campaign metadata for advertiser_id "
+            f"{advertiser_id} with "
+            f"{df.attrs['rows_output']}/"
+            f"{df.attrs['rows_input']} with "
+            f"{len(failed_campaign_ids)} failed campaign_id(s) in "
+            f"{df.attrs['time_elapsed']}s."
+    )
+        
+    print(
+        "✅ [EXTRACT] Successfully extracted TikTok Ads campaign metadata for advertiser_id "
+        f"{advertiser_id} with "
+        f"{df.attrs['rows_output']}/"
+        f"{df.attrs['rows_input']} with "
+        f"{len(failed_campaign_ids)} failed campaign_id(s) in "
+        f"{df.attrs['time_elapsed']}s."
+    )        
 
     return df
