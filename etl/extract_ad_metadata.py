@@ -65,6 +65,15 @@ def extract_ad_metadata(
         df.attrs["time_elapsed"] = round(time.time() - start_time, 2)
         df.attrs["rows_input"] = 0
         df.attrs["rows_output"] = 0
+        
+        print(
+            "⚠️ [EXTRACT] Completely extracted TikTok Ads ad insights for advertiser_id "
+            f"{advertiser_id} but returned "
+            f"{df.attrs['rows_output']} row(s) due to "
+            f"{df.attrs['rows_output']} input ad_id in "
+            f"{df.attrs['time_elapsed']}s."
+        )
+
         return df
 
     # Make TikTok Ads API v1.3 call for advertiser name
@@ -349,5 +358,24 @@ def extract_ad_metadata(
     df.attrs["time_elapsed"] = round(time.time() - start_time, 2)
     df.attrs["rows_input"] = len(ad_ids)
     df.attrs["rows_output"] = len(df)
+
+    if df.attrs["rows_output"] < df.attrs["rows_input"]:
+        print(
+            "⚠️ [EXTRACT] Partially extracted TikTok Ads ad metadata for advertiser_id "
+            f"{advertiser_id} with "
+            f"{df.attrs['rows_output']}/"
+            f"{df.attrs['rows_input']} with "
+            f"{len(failed_ad_ids)} failed ad_id(s) in "
+            f"{df.attrs['time_elapsed']}s."
+    )
+        
+    print(
+        "✅ [EXTRACT] Successfully extracted TikTok Ads ad metadata for advertiser_id "
+        f"{advertiser_id} with "
+        f"{df.attrs['rows_output']}/"
+        f"{df.attrs['rows_input']} with "
+        f"{len(failed_ad_ids)} failed ad_id(s) in "
+        f"{df.attrs['time_elapsed']}s."
+    )        
 
     return df
