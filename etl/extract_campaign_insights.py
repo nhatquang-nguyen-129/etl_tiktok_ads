@@ -160,6 +160,15 @@ def extract_campaign_insights(
         df.attrs["rows_input"] = None
         df.attrs["rows_output"] = len(df)
 
+        print(
+            "✅ [EXTRACT] Successfully extracted TikTok Ads campaign insights for advertiser_id "
+            f"{advertiser_id} from "
+            f"{start_date} to "
+            f"{end_date} with "
+            f"{len(df)} row(s) in "
+            f"{df.attrs['time_elapsed']}s."
+        )
+
         return df
 
         # Unexpected retryable request timeout error
