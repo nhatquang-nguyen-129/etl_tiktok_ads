@@ -30,9 +30,23 @@ select
     campaign.objective_type,
 
     case
-        when campaign.operation_status = 'ACTIVE'                    then '🟢'
-        when campaign.operation_status = 'PAUSED'                    then '⚪'
-        when campaign.operation_status in ('ARCHIVED', 'DELETED')    then '🔴'
+        when campaign.operation_status in (
+            'ENABLE', 
+            'AUDIT'
+            ) then '🟢'
+
+        when campaign.operation_status in (
+            'DISABLE', 
+            'PAUSED'
+            ) then '⚪'
+
+        when campaign.operation_status in (
+            'REJECT', 
+            'DELETE', 
+            'INVALID', 
+            'FROZEN'
+            ) then '🔴'
+
         else '❓'
     end as campaign_status,
 
