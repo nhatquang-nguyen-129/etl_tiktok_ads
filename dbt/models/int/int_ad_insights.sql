@@ -16,11 +16,25 @@ select
     ad.ad_name,
 
     case
-        when ad.operation_status = 'ACTIVE'                 then '🟢'
-        when ad.operation_status = 'PAUSED'                then '⚪'
-        when ad.operation_status in ('ARCHIVED','DELETED')  then '🔴'
+        when ad.operation_status in (
+            'ENABLE', 
+            'AUDIT'
+            ) then '🟢'
+
+        when ad.operation_status in (
+            'DISABLE', 
+            'PAUSED'
+            ) then '⚪'
+
+        when ad.operation_status in (
+            'REJECT', 
+            'DELETE', 
+            'INVALID', 
+            'FROZEN'
+            ) then '🔴'
+
         else '❓'
-    end as ad_status,
+    end as ad_status
 
     ad.location,
     ad.gender,
