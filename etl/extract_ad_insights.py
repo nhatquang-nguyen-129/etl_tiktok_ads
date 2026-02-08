@@ -155,10 +155,10 @@ def extract_ad_insights(
             rows.append(row)
 
         df = pd.DataFrame(rows)
-        df.attrs("retryable") = False
-        df.attrs("time_elapsed") = round(time.time() - start_time, 2)
-        df.attrs("rows_input") = None
-        df.attrs("rows_output") = len(df)
+        df.attrs["retryable"] = False
+        df.attrs["time_elapsed"] = round(time.time() - start_time, 2)
+        df.attrs["rows_input"] = None
+        df.attrs["rows_output"] = len(df)
 
         return df
 
