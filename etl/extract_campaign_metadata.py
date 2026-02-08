@@ -54,11 +54,11 @@ def extract_campaign_metadata(
                 "advertiser_name",
             ]
         )
-        df.attrs("failed_campaign_ids") = []
-        df.attrs("retryable") = False
-        df.attrs("time_elapsed") = round(time.time() - start_time, 2)
-        df.attrs("rows_input") = 0
-        df.attrs("rows_output") = 0
+        df.attrs["failed_campaign_ids"] = []
+        df.attrs["retryable"] = False
+        df.attrs["time_elapsed"] = round(time.time() - start_time, 2)
+        df.attrs["rows_input"] = 0
+        df.attrs["rows_output"] = 0
         return df
 
     # Make TikTok Ads API v1.3 call for advertiser name   
@@ -300,10 +300,10 @@ def extract_campaign_metadata(
             ) from e
 
     df = pd.DataFrame(rows)
-    df.attrs("failed_campaign_ids") = failed_campaign_ids
-    df.attrs("retryable") = bool(failed_campaign_ids) and retryable
-    df.attrs("time_elapsed") = round(time.time() - start_time, 2)
-    df.attrs("rows_input") = len(campaign_ids)
-    df.attrs("rows_output") = len(df)
+    df.attrs["failed_campaign_ids"] = failed_campaign_ids
+    df.attrs["retryable"] = bool(failed_campaign_ids) and retryable
+    df.attrs["time_elapsed"] = round(time.time() - start_time, 2)
+    df.attrs["rows_input"] = len(campaign_ids)
+    df.attrs["rows_output"] = len(df)
 
     return df
