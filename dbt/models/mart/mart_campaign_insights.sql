@@ -34,7 +34,8 @@ select
 
     platform,
     objective,
-    budget_group,
+    budget_group_1,
+    budget_group_2,
     region,
     category_level_1,
     track_group,
