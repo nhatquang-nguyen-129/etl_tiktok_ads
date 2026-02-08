@@ -6,7 +6,7 @@
       "data_type": "date"
     },
     cluster_by = ["advertiser_id", "campaign_id"],
-    tags = ['mart', 'tiktok', 'ad']    
+    tags = ['mart', 'tiktok', 'campaign']    
   ) 
 }}
 
