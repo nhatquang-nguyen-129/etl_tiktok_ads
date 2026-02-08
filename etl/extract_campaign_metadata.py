@@ -59,6 +59,15 @@ def extract_campaign_metadata(
         df.attrs["time_elapsed"] = round(time.time() - start_time, 2)
         df.attrs["rows_input"] = 0
         df.attrs["rows_output"] = 0
+
+        print(
+            "⚠️ [EXTRACT] Completely extracted TikTok Ads campaign metadata for advertiser_id "
+            f"{advertiser_id} but returned "
+            f"{df.attrs['rows_output']} row(s) due to "
+            f"{df.attrs['rows_output']} input ad_id in "
+            f"{df.attrs['time_elapsed']}s."
+        )        
+
         return df
 
     # Make TikTok Ads API v1.3 call for advertiser name   

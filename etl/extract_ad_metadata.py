@@ -67,7 +67,7 @@ def extract_ad_metadata(
         df.attrs["rows_output"] = 0
         
         print(
-            "⚠️ [EXTRACT] Completely extracted TikTok Ads ad insights for advertiser_id "
+            "⚠️ [EXTRACT] Completely extracted TikTok Ads ad metadata for advertiser_id "
             f"{advertiser_id} but returned "
             f"{df.attrs['rows_output']} row(s) due to "
             f"{df.attrs['rows_output']} input ad_id in "
