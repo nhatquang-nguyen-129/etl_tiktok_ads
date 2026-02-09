@@ -34,10 +34,11 @@ select
 
     platform,
     objective,
-    budget_group_1,
-    budget_group_2,
     region,
+    budget_group_1,
+    budget_group_2,   
     category_level_1,
+    personnel,
     track_group,
     pillar_group,
     content_group
