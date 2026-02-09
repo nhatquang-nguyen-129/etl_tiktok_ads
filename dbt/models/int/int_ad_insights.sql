@@ -22,7 +22,7 @@ select
     insights.result,
 
     insights.engaged_view_15s,
-    insights.purchase
+    insights.purchase,
 
     case
         when ad.operation_status in (
