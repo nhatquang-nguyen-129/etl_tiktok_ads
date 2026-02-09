@@ -17,23 +17,31 @@ def dags_tiktok_ads(
     end_date: str,
     max_workers: int = 2,
 ):
+
+    start_time = time.time()
+    futures = {}
+
     print(
-        f"🔄 [DAGS] Trigger TikTok Ads DAGs for {advertiser_id} "
-        f"from {start_date} → {end_date} | workers={max_workers}"
+        "🔄 [DAGS] Triggering to update TikTok insights for "
+        f"{advertiser_id} from "
+        f"{start_date} to "
+        f"{end_date} with " 
+        f"{max_workers} max_workers..."
     )
 
+    # Submit tasks
     tasks = {
         "campaign_insights": dags_campaign_insights,
         "ad_insights": dags_ad_insights,
     }
 
-    start_time = time.time()
-    futures = {}
-
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        # submit ALL tasks
         for name, fn in tasks.items():
-            print(f"▶️  [DAGS:{name}] RUNNING")
+            print(
+                "🔄 [DAGS] Triggering to execute "
+                f"{name} task with ThreadPoolExecutor..."
+            )
+            
             future = executor.submit(
                 fn,
                 access_token=access_token,
@@ -49,24 +57,25 @@ def dags_tiktok_ads(
             name = futures[future]
             completed.add(name)
 
-            print("\n" + "=" * 120)
-            print(f"[DAGS] TASK FINISHED: {name}")
-            print("=" * 120)
-
             try:
                 future.result()
-                print(f"✅ [DAGS:{name}] COMPLETED")
+                print(f"📊 [DAGS] TASK EXECUTION SUMMARY FOR {name}")
+                print("=" * 120)
+                print("STATUS : SUCCESS")
+                print("-" * 120)
             except Exception as e:
-                print(f"❌ [DAGS:{name}] FAILED")
-                print(str(e))
+                print(f"📊 [DAGS] TASK EXECUTION SUMMARY FOR {name}")
+                print("=" * 120)
+                print("STATUS : FAILED")
+                print("-" * 120)
+                print(str(e))          
 
-            print("=" * 120)
-
-            remaining = [n for n in tasks if n not in completed]
-            if remaining:
-                print("\n⏳ Still running:")
-                for r in remaining:
-                    print(f"   ▶️  [DAGS:{r}] RUNNING")
+            remaining_tasks = [n for n in tasks if n not in completed]
+            if remaining_tasks:
+                print("\n📊 [DAGS] REMAINNING TASK LIST:")
+                for remaining_task in remaining_tasks:
+                    print(
+                        f"{remaining_task:<25} : Executing")
                 print()
 
     total_elapsed = round(time.time() - start_time, 2)
