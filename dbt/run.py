@@ -8,7 +8,6 @@ import subprocess
 
 def dbt_tiktok_ads(
     *,
-    google_cloud_project: str,
     select: str
 ):
     """
@@ -32,12 +31,6 @@ def dbt_tiktok_ads(
         "--select", select,
     ]
 
-    print(
-        "🔄 [DBT] Executing dbt build for TikTok Ads "
-        f"{select} insights to Google Cloud Project "
-        f"{google_cloud_project}..."
-    )
-
     try:
         result = subprocess.run(
             cmd,
@@ -47,12 +40,6 @@ def dbt_tiktok_ads(
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
-        )
-
-        print(
-            "✅ [DBT] Successfully executed dbt build for TikTok Ads "
-            f"{select} insights to Google Cloud Project "
-            f"{google_cloud_project}."
         )
 
         # Buffered dbt global logging
