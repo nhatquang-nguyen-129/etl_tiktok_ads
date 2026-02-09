@@ -42,7 +42,7 @@ def transform_campaign_insights(
             "❌ [TRANSFORM] Failed to transform TikTok Ads campaign insights due to missing columns "
             f"{missing} then transformation will be suspended."
         )
-    
+
     # Normalize numeric metrics
     for col in [
         "impressions", 
