@@ -204,7 +204,7 @@ class internalGoogleBigqueryLoader:
         try:
             print(
                 "🔍 [PLUGIN] Validating Google BigQuery table " 
-                "f{direction} existence..."
+                f"{direction} existence..."
             )
             
             self._init_client(direction)
@@ -242,6 +242,17 @@ class internalGoogleBigqueryLoader:
                 f"{partition} and cluster on "
                 f"{cluster}..."
             )
+
+            # DEBUG
+            print("🔍 [PLUGIN] Schema preview:")
+            for f in self._infer_table_schema(df):
+                print(f" - {f.name}: {f.field_type}")
+            # DEBUG
+            print("🔍 [PLUGIN] Object-like columns:")
+            print([
+                col for col in df.columns
+                if df[col].apply(lambda x: isinstance(x, (dict, list))).any()
+            ])                
 
             table = bigquery.Table(
                 direction,

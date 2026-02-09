@@ -44,10 +44,10 @@ def load_ad_creative(
         mode="upsert",
         keys=[
             "advertiser_id", 
-            "ad_id"
+            "video_id"
         ],
         partition=None,
         cluster=[
-            "ad_id"
+            "video_id"
         ],
     )

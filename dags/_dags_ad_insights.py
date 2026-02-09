@@ -233,7 +233,7 @@ def dags_ad_insights(
     # Transform
     print(
         "🔄 [DAGS] Trigger to transform TikTok Ads campaign metadata for "
-        f"{len(df_campaign_metadatas)} row(s)..."
+        f"{len(df_ad_metadatas)} row(s)..."
     )
 
     df_ad_metadatas = transform_ad_metadata(df_ad_metadatas)
@@ -325,7 +325,7 @@ def dags_ad_insights(
 
     print(
         "🔄 [DAGS] Trigger to load TikTok Ads ad creative for "
-        f"{len(df_ad_creatives)} row(s) to"
+        f"{len(df_ad_creatives)} row(s) to "
         f"{_ad_creative_direction}..."        
     )    
 
