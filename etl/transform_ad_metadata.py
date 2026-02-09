@@ -3,7 +3,6 @@ from pathlib import Path
 ROOT_FOLDER_LOCATION = Path(__file__).resolve().parents[2]
 sys.path.append(str(ROOT_FOLDER_LOCATION))
 
-import logging
 import pandas as pd
 
 def transform_ad_metadata(
@@ -22,17 +21,13 @@ def transform_ad_metadata(
             Enforced ad metadata records
     """
 
-    msg = (
+    print(
         "🔄 [TRANSFORM] Transforming "
         f"{len(df)} row(s) of TikTok Ads ad metadata..."
     )
-    print(msg)
-    logging.info(msg)
 
     if df.empty:
-        msg = "⚠️ [TRANSFORM] Empty ad metadata then transformation will be suspended."
-        print(msg)
-        logging.warning(msg)
+        print("⚠️ [TRANSFORM] Empty ad metadata then transformation will be suspended.")
         return df
 
     required_cols = {
@@ -63,11 +58,9 @@ def transform_ad_metadata(
         content=lambda df: df["adgroup_name"].fillna("").str.split("|").str[8].fillna("unknown")
     )  
 
-    msg = (
+    print(
         "✅ [TRANSFORM] Successfully transformed "
         f"{len(df)} row(s) of TikTok Ads ad metadata."
     )
-    print(msg)
-    logging.info(msg)
 
     return df
