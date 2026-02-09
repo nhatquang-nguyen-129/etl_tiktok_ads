@@ -16,8 +16,10 @@ def dbt_tiktok_ads(
     ---------
     Workflow:
         1. Initialize dbt execution environment
-        2. Trigger dbt build command for dbt models
-        3. Capture dbt execution logs with stdout and stderr
+        2. Initialize Python subprocess to execute CLI
+        3. Execute dbt build command with environment variables
+        4. Execute dbt build command for dbt models stg/int/mart
+        3. Capture dbt execution status with stdout and stderr
     ---------
     Returns:
         None
