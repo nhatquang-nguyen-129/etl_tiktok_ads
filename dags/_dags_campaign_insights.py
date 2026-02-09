@@ -254,7 +254,9 @@ def dags_campaign_insights(
 # Materialization with dbt 
     print("🔄 [DAGS] Trigger to materialize TikTok Ads campaign insights with dbt...")
     
-    dbt_tiktok_ads(
+    dbt_execution_result = dbt_tiktok_ads(
         google_cloud_project=PROJECT,
         select="tag:mart,tag:campaign",
     )
+
+    print(dbt_execution_result.get("stdout", "").rstrip())    
