@@ -22,7 +22,7 @@ def dags_tiktok_ads(
     futures = {}
 
     print(
-        "🔄 [DAGS] Triggering to update TikTok insights for "
+        "🔄 [DAGS] Triggering to update TikTok Ads insights for "
         f"{advertiser_id} from "
         f"{start_date} to "
         f"{end_date} with " 
@@ -79,4 +79,7 @@ def dags_tiktok_ads(
                 print()
 
     total_elapsed = round(time.time() - start_time, 2)
-    print(f"🏁 [DAGS] TikTok Ads update finished in {total_elapsed}s")
+    print(
+        "✅ [DAGS] Successfully triggered to update TikTok Ads insights using ThreadPoolExecutor in "
+        f"{total_elapsed}s."
+        )
