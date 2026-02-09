@@ -44,7 +44,19 @@ def transform_campaign_insights(
         )
     
     # Normalize numeric metrics
-    for col in ["impressions", "clicks", "spend"]:
+    for col in [
+        "impressions", 
+        "clicks", 
+        "spend",
+        "result",
+        "engaged_view_15s",
+        "onsite_shopping",
+        "offline_shopping_events",
+        "complete_payment",
+        "onsite_total_purchase",
+        "purchase",
+        "messaging_total_conversation_tiktok_direct_message",
+    ]:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
 
