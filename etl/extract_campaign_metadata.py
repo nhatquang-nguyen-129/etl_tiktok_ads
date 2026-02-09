@@ -39,7 +39,7 @@ def extract_campaign_metadata(
     }
 
     timeout = (
-        10,
+        30,
         600
     )
 
