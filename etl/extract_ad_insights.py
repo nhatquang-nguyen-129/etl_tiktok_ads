@@ -36,7 +36,7 @@ def extract_ad_insights(
     }
 
     timeout = (
-        10,
+        30,
         600
     )
 
