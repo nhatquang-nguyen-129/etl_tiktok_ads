@@ -24,3 +24,14 @@ $env:DEPARTMENT="marketing";
 $env:ACCOUNT="main"; 
 python -m backfill.backfill_ad_insights --start_date=2026-01-23 --end_date=2026-01-23
 ```
+
+- CLI usage example both threads using ThreadPoolExecutor: 
+
+```bash
+$env:PROJECT ="seer-digital-ads"; 
+$env:COMPANY="kids"; 
+$env:PLATFORM="tiktok"; 
+$env:DEPARTMENT="marketing"; 
+$env:ACCOUNT="main"; 
+python -m backfill.backfill_tiktok_ads --start_date=2026-01-23 --end_date=2026-01-23
+```

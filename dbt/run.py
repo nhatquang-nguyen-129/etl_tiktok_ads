@@ -44,6 +44,9 @@ def dbt_tiktok_ads(
             cwd="dbt",
             env=os.environ,
             check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
         )
 
         print(
