@@ -168,8 +168,9 @@ def extract_campaign_metadata(
         "advertiser_id",
         "campaign_id",
         "campaign_name",
+        "campaign_type",
         "operation_status",
-        "objective_type",
+        "objective",
     ]
 
     print(

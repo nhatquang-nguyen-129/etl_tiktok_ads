@@ -25,6 +25,7 @@ select
 
     ad_name,
     ad_status,
+    video_id,
     video_cover_url,
 
     impressions,
@@ -47,6 +48,7 @@ select
     pillar_group,
     content_group,
 
+    adgroup_name,
     location,
     gender,
     age,

@@ -58,8 +58,6 @@ select
     split('{{ table_name }}', '_')[offset(4)] as account,
 
     advertiser_id,
-    campaign_id,
-    adgroup_id,
     ad_id,
 
     DATE(date) as date,
@@ -71,7 +69,6 @@ select
     spend,
 
     result,
-    optimization_event,
 
     engaged_view_15s,
     purchase

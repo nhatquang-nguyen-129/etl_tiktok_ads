@@ -9,8 +9,6 @@ select
     date(insights.date) as date,
 
     insights.advertiser_id,
-    insights.campaign_id,
-    insights.adgroup_id,
     insights.ad_id,
 
     ad.ad_name,
@@ -36,6 +34,10 @@ select
         else '❓'
     end as ad_status,
 
+    ad.adgroup_id,
+    ad.adgroup_name,
+    ad.ad_name,
+    ad.optimization_event,
     ad.location,
     ad.gender,
     ad.age,
@@ -46,6 +48,7 @@ select
     ad.pillar,
     ad.content,
 
+    campaign.campaign_id,
     campaign.campaign_name,
     campaign.platform,
     campaign.objective,
@@ -57,6 +60,7 @@ select
     campaign.pillar_group,
     campaign.content_group,
 
+    creative.video_id,
     creative.video_cover_url,
 
     insights.impressions,
@@ -64,7 +68,6 @@ select
     insights.spend,
 
     insights.result,
-    insights.optimization_event,
 
     insights.engaged_view_15s,
     insights.purchase
@@ -76,8 +79,8 @@ left join `{{ target.project }}.{{ var('company') }}_dataset_tiktok_api_raw.{{ v
    and insights.ad_id         = ad.ad_id
 
 left join `{{ target.project }}.{{ var('company') }}_dataset_tiktok_api_raw.{{ var('company') }}_table_tiktok_{{ var('department') }}_{{ var('account') }}_campaign_metadata` campaign
-    on insights.advertiser_id = campaign.advertiser_id
-   and insights.campaign_id  = campaign.campaign_id
+    on ad.advertiser_id = campaign.advertiser_id
+   and ad.campaign_id   = campaign.campaign_id
 
 left join `{{ target.project }}.{{ var('company') }}_dataset_tiktok_api_raw.{{ var('company') }}_table_tiktok_{{ var('department') }}_{{ var('account') }}_ad_creative` creative
     on ad.advertiser_id = creative.advertiser_id
