@@ -38,7 +38,7 @@ def extract_ad_metadata(
     }
 
     timeout =(
-        10,
+        30,
         600
     )
 
