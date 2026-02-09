@@ -5,7 +5,6 @@ ROOT_FOLDER_LOCATION = Path(__file__).resolve().parents[0]
 sys.path.append(str(ROOT_FOLDER_LOCATION))
 
 from datetime import datetime, timedelta
-import logging
 from zoneinfo import ZoneInfo
 
 from google.cloud import secretmanager
@@ -42,7 +41,7 @@ def main():
         None
     """
     
-    msg = (
+    print(
         "🔄 [MAIN] Triggering to update TikTok Ads for "
         f"{ACCOUNT} account of "
         f"{DEPARTMENT} department in "
@@ -50,8 +49,6 @@ def main():
         f"{MODE} mode to Google Cloud project "
         f"{PROJECT}..."
     )
-    print(msg)
-    logging.info(msg)    
 
 # Resolve input time range
     ICT = ZoneInfo("Asia/Ho_Chi_Minh")
@@ -83,30 +80,24 @@ def main():
             f"{MODE}."
         )
     
-    msg = (
+    print(
         "✅ [MAIN] Successfully resolved "
         f"{MODE} mode to date range from "
         f"{start_date} to "
         f"{end_date}."
     )
-    print(msg)
-    logging.info(msg)
 
 # Initialize Google Secret Manager
     try:
-        msg = ("🔍 [MAIN] Initialize Google Secret Manager client...")
-        print(msg)
-        logging.info(msg)
-        
+        print("🔍 [MAIN] Initialize Google Secret Manager client...")
+
         google_secret_client = secretmanager.SecretManagerServiceClient(
             client_options=ClientOptions(
                 api_endpoint="secretmanager.googleapis.com"
             )
         )
 
-        msg = ("✅ [MAIN] Successfully initialized Google Secret Manager client.")
-        print(msg)
-        logging.info(msg)
+        print("✅ [MAIN] Successfully initialized Google Secret Manager client.")
     
     except Exception as e:
         raise RuntimeError(
@@ -123,12 +114,10 @@ def main():
             f"projects/{PROJECT}/secrets/{secret_account_id}/versions/latest"
         )
         
-        msg = (
+        print(
             "🔍 [MAIN] Retrieving TikTok Ads secret_account_id "
             f"{secret_account_name} from Google Secret Manager..."
         )
-        print(msg)
-        logging.info(msg)        
 
         secret_account_response = google_secret_client.access_secret_version(
             name=secret_account_name,
@@ -136,12 +125,10 @@ def main():
         )
         advertiser_id = secret_account_response.payload.data.decode("utf-8")
         
-        msg = (
+        print(
             "✅ [MAIN] Successfully retrieved TikTok Ads advertiser_id "
             f"{advertiser_id} from Google Secret Manager."
         )
-        print(msg)
-        logging.info(msg)
     
     except Exception as e:
         raise RuntimeError(
@@ -158,22 +145,18 @@ def main():
             f"projects/{PROJECT}/secrets/{secret_token_id}/versions/latest"
         )
         
-        msg = (
+        print(
             "🔍 [MAIN] Retrieving TikTok Ads access token with secret_token_name "
             f"{secret_token_name} from Google Secret Manager..."
         )
-        print(msg)
-        logging.info(msg)
 
         secret_token_response = google_secret_client.access_secret_version(
             name=secret_token_name
         )
         access_token = secret_token_response.payload.data.decode("utf-8")
         
-        msg = ("✅ [MAIN] Successfully retrieved TikTok Ads access token from Google Secret Manager.")
-        print(msg)
-        logging.info(msg)
-    
+        print("✅ [MAIN] Successfully retrieved TikTok Ads access token from Google Secret Manager.")
+
     except Exception as e:
         raise RuntimeError(
             "❌ [MAIN] Failed to retrieve TikTok Ads access token from Google Secret Manager due to "
