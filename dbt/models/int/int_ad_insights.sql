@@ -48,7 +48,6 @@ select
     ad.ad_name,
     ad.adgroup_id,
     ad.adgroup_name,
-    ad.ad_name,
     ad.optimization_event,
     ad.location,
     ad.gender,
