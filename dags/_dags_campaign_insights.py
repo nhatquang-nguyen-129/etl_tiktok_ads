@@ -251,16 +251,10 @@ def dags_campaign_insights(
         direction=_campaign_metadata_direction,
     )
 
-# Materialization with dbt 
+# Materialization with dbt
     print("🔄 [DAGS] Trigger to materialize TikTok Ads campaign insights with dbt...")
     
-    dbt_execution_result = dbt_tiktok_ads(
+    dbt_tiktok_ads(
+        google_cloud_project=PROJECT,
         select="tag:mart,tag:campaign",
     )
-
-    return {
-        "step": "dbt",
-        "scope": "campaign",
-        "select": "tag:mart,tag:campaign",
-        **dbt_execution_result,
-    }
