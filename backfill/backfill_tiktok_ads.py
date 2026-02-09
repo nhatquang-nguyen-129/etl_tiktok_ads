@@ -75,7 +75,7 @@ def backfill():
 
 # Initialize Google Secret Manager
     try:
-        print("🔍 [MAIN] Initialize Google Secret Manager client...")
+        print("🔍 [BACKFILL] Initialize Google Secret Manager client...")
 
         google_secret_client = secretmanager.SecretManagerServiceClient(
             client_options=ClientOptions(
@@ -83,11 +83,11 @@ def backfill():
             )
         )
 
-        print("✅ [MAIN] Successfully initialized Google Secret Manager client.")
+        print("✅ [BACKFILL] Successfully initialized Google Secret Manager client.")
     
     except Exception as e:
         raise RuntimeError(
-            "❌ [MAIN] Failed to initialize Google Secret Manager client due to."
+            "❌ [BACKFILL] Failed to initialize Google Secret Manager client due to."
             f"{e}."
         )
         
@@ -101,7 +101,7 @@ def backfill():
         )
         
         print(
-            "🔍 [MAIN] Retrieving TikTok Ads secret_account_id "
+            "🔍 [BACKFILL] Retrieving TikTok Ads secret_account_id "
             f"{secret_account_name} from Google Secret Manager..."
         )
 
@@ -112,13 +112,13 @@ def backfill():
         advertiser_id = secret_account_response.payload.data.decode("utf-8")
         
         print(
-            "✅ [MAIN] Successfully retrieved TikTok Ads advertiser_id "
+            "✅ [BACKFILL] Successfully retrieved TikTok Ads advertiser_id "
             f"{advertiser_id} from Google Secret Manager."
         )
     
     except Exception as e:
         raise RuntimeError(
-            "❌ [MAIN] Failed to retrieve TikTok Ads account_id from Google Secret Manager due to "
+            "❌ [BACKFILL] Failed to retrieve TikTok Ads account_id from Google Secret Manager due to "
             f"{e}."
         )
 
@@ -132,7 +132,7 @@ def backfill():
         )
         
         print(
-            "🔍 [MAIN] Retrieving TikTok Ads access token with secret_token_name "
+            "🔍 [BACKFILL] Retrieving TikTok Ads access token with secret_token_name "
             f"{secret_token_name} from Google Secret Manager..."
         )
 
@@ -141,11 +141,11 @@ def backfill():
         )
         access_token = secret_token_response.payload.data.decode("utf-8")
         
-        print("✅ [MAIN] Successfully retrieved TikTok Ads access token from Google Secret Manager.")
+        print("✅ [BACKFILL] Successfully retrieved TikTok Ads access token from Google Secret Manager.")
 
     except Exception as e:
         raise RuntimeError(
-            "❌ [MAIN] Failed to retrieve TikTok Ads access token from Google Secret Manager due to "
+            "❌ [BACKFILL] Failed to retrieve TikTok Ads access token from Google Secret Manager due to "
             f"{e}."
         )        
 
@@ -160,6 +160,6 @@ def backfill():
 # Entrypoint
 if __name__ == "__main__":
     try:
-        main()
+        backfill()
     except Exception:
         sys.exit(1)
