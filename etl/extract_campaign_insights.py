@@ -36,7 +36,7 @@ def extract_campaign_insights(
     }
 
     timeout =(
-        10,
+        30,
         600
     )
     
