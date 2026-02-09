@@ -36,7 +36,7 @@ def extract_ad_creative(
     }
 
     timeout = (
-        10, 
+        30, 
         600
     )
 
