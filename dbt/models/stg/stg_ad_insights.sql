@@ -31,8 +31,6 @@ select
     cast(null as string)  as account,
 
     cast(null as string)  as advertiser_id,
-    cast(null as string)  as campaign_id,
-    cast(null as string)  as adgroup_id,
     cast(null as string)  as ad_id,
 
     cast(null as int64)   as impressions,
@@ -59,7 +57,7 @@ select
     split('{{ table_name }}', '_')[offset(3)] as department,
     split('{{ table_name }}', '_')[offset(4)] as account,
 
-    account_id,
+    advertiser_id,
     campaign_id,
     adgroup_id,
     ad_id,

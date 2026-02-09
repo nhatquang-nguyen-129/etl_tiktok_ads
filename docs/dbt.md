@@ -3,25 +3,37 @@
 ## Purpose
 
 - Use **dbt** to build TikTok analytics-ready **materialized tables** in **Google BigQuery**
+
 - Used **dbt** only for **SQL transformations** and all ELT processes are handled upstream
+
 - Join TikTok Ads campaign insights fact tables with campaign metadata dim table
+
 - Join TikTok Ads ad insights fact tables with campaign metadata/adset metadata/ad metadata/ad creative dim tables
+
 - Define final analytical grain and manage model dependencies using `ref()`
 
 ---
 
 ## Install
 
-### Activate Python venv
+### Switch to Python 3.13 Interpreter
+- Explicitly choose the correct Python interpreter if multiple versions was installed
 
-- Create Python virtual environment if `venv\` folder not exists
+- Create a Python virtual environment using Python 3.13 interpreter when run from the root folder
 ```bash
-python -m venv venv
+& "C:\Users\ADMIN\AppData\Local\Programs\Python\Python313\python.exe" -m venv venv
 ```
+
+- Check available Python interpreter if there is any uncertainty by press `Ctrl + Shift + P` then select `Python: Select Interpreter`
 
 - Activate Python virtual environment and check `(venv)` in the terminal
 ```bash
 venv/scripts/activate
+```
+
+- Verify Python virtual environment and check Python Interpreter version
+```bash
+python --version
 ```
 
 ---
@@ -109,10 +121,10 @@ dbt build `
 
 - Run only ad insights
 ```bash
-$env:PROJECT="your-gcp-project"
-$env:COMPANY="your-company-in-short"
-$env:DEPARTMENT="your-department"
-$env:ACCOUNT="your-account"
+$env:PROJECT="seer-digital-ads"
+$env:COMPANY="kids"
+$env:DEPARTMENT="marketing"
+$env:ACCOUNT="main"
 
 dbt build `
   --project-dir dbt `
