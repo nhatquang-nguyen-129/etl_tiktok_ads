@@ -24,7 +24,7 @@ def load_ad_metadata(
     ---------
     Returns:
         None
-    """      
+    """
 
     if df.empty:
         print("⚠️ [LOADER] Empty TikTok Ads ad metadata Dataframe then loading will be suspended.")
