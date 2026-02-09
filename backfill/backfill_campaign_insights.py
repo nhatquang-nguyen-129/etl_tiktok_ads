@@ -5,7 +5,6 @@ sys.path.append(str(ROOT_FOLDER_LOCATION))
 
 import argparse
 from datetime import datetime
-import logging
 import os
 
 from google.cloud import secretmanager
@@ -63,7 +62,7 @@ def backfill():
     if start_date > end_date:
         raise ValueError("❌ [BACKFILL] Failed to execute TikTok Ads campaign insights update due to start_date must be less than or equal to end_date.")
 
-    msg = (
+    print(
         "🔄 [BACKFILL] Triggering to execute TikTok Ads campaign insights update for "
         f"{ACCOUNT} account of "
         f"{DEPARTMENT} department in "
@@ -72,14 +71,10 @@ def backfill():
         f"{end_date} on Google Cloud Project "
         f"{PROJECT}..."
     )
-    print(msg)
-    logging.info(msg)
 
 # Initialize Google Secret Manager
     try:
-        msg = ("🔍 [BACKFILL] Initialize Google Secret Manager client...")
-        print(msg)
-        logging.info(msg)
+        print("🔍 [BACKFILL] Initialize Google Secret Manager client...")        
         
         google_secret_client = secretmanager.SecretManagerServiceClient(
             client_options=ClientOptions(
@@ -87,9 +82,7 @@ def backfill():
             )
         )
 
-        msg = ("✅ [BACKFILL] Successfully initialized Google Secret Manager client.")
-        print(msg)
-        logging.info(msg)
+        print("✅ [BACKFILL] Successfully initialized Google Secret Manager client.")
     
     except Exception as e:
         raise RuntimeError(
@@ -106,12 +99,10 @@ def backfill():
             f"projects/{PROJECT}/secrets/{secret_account_id}/versions/latest"
         )
         
-        msg = (
+        print(
             "🔍 [BACKFILL] Retrieving TikTok Ads secret_account_id "
             f"{secret_account_name} from Google Secret Manager..."
-        )
-        print(msg)
-        logging.info(msg)        
+        )    
 
         secret_account_response = google_secret_client.access_secret_version(
             name=secret_account_name,
@@ -119,12 +110,10 @@ def backfill():
         )
         advertiser_id = secret_account_response.payload.data.decode("utf-8")
         
-        msg = (
+        print(
             "✅ [BACKFILL] Successfully retrieved TikTok Ads advertiser_id "
             f"{advertiser_id} from Google Secret Manager."
         )
-        print(msg)
-        logging.info(msg)
     
     except Exception as e:
         raise RuntimeError(
@@ -141,21 +130,17 @@ def backfill():
             f"projects/{PROJECT}/secrets/{secret_token_id}/versions/latest"
         )
         
-        msg = (
+        print(
             "🔍 [BACKFILL] Retrieving TikTok Ads access token with secret_token_name "
             f"{secret_token_name} from Google Secret Manager..."
         )
-        print(msg)
-        logging.info(msg)
 
         secret_token_response = google_secret_client.access_secret_version(
             name=secret_token_name
         )
         access_token = secret_token_response.payload.data.decode("utf-8")
         
-        msg = ("✅ [BACKFILL] Successfully retrieved TikTok Ads access token from Google Secret Manager.")
-        print(msg)
-        logging.info(msg)
+        print("✅ [BACKFILL] Successfully retrieved TikTok Ads access token from Google Secret Manager.")
     
     except Exception as e:
         raise RuntimeError(
