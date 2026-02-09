@@ -7,6 +7,8 @@
 
 select
     date(insights.date) as date,
+    month,
+    year,
 
     insights.advertiser_id,
     insights.ad_id,
