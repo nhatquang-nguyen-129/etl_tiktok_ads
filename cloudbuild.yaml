@@ -1,6 +1,6 @@
 substitutions:
   _REGION: asia-southeast1
-  _IMAGE: asia-southeast1-docker.pkg.dev/seer-digital-ads/artifact-repository-tiktok/v1.0.1
+  _IMAGE: asia-southeast1-docker.pkg.dev/seer-digital-ads/artifact-repository-tiktok/v2.0.0
 
 steps:
   - name: 'gcr.io/cloud-builders/docker'
