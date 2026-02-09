@@ -260,5 +260,7 @@ def dags_campaign_insights(
 
     return {
         "step": "dbt",
+        "scope": "campaign",
+        "select": "tag:mart,tag:campaign",
         **dbt_execution_result,
     }

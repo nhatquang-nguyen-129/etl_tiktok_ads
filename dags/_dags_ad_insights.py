@@ -441,5 +441,7 @@ def dags_ad_insights(
 
     return {
         "step": "dbt",
+        "scope": "ad",
+        "select": "tag:mart,tag:ad",
         **dbt_execution_result,
     }
