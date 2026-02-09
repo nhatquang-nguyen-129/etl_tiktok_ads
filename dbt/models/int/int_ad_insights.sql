@@ -10,10 +10,19 @@ select
     month,
     year,
 
+    insights.department,
+    insights.account,
     insights.advertiser_id,
     insights.ad_id,
+    
+    insights.impressions,
+    insights.clicks,
+    insights.spend,
 
-    ad.ad_name,
+    insights.result,
+
+    insights.engaged_view_15s,
+    insights.purchase
 
     case
         when ad.operation_status in (
@@ -36,6 +45,7 @@ select
         else '❓'
     end as ad_status,
 
+    ad.ad_name,
     ad.adgroup_id,
     ad.adgroup_name,
     ad.ad_name,
@@ -63,16 +73,7 @@ select
     campaign.content_group,
 
     creative.video_id,
-    creative.video_cover_url,
-
-    insights.impressions,
-    insights.clicks,
-    insights.spend,
-
-    insights.result,
-
-    insights.engaged_view_15s,
-    insights.purchase
+    creative.video_cover_url
 
 from {{ ref('stg_ad_insights') }} insights
 
