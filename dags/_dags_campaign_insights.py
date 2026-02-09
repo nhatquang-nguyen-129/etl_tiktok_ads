@@ -251,7 +251,7 @@ def dags_campaign_insights(
         direction=_campaign_metadata_direction,
     )
 
-# Materialization with dbt
+# Materialization with dbt 
     print("🔄 [DAGS] Trigger to materialize TikTok Ads campaign insights with dbt...")
     
     dbt_tiktok_ads(
