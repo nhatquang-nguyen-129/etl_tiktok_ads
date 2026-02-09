@@ -39,7 +39,7 @@ def dbt_tiktok_ads(
     )
 
     try:
-        subprocess.run(
+        result = subprocess.run(
             cmd,
             cwd="dbt",
             env=os.environ,
@@ -55,10 +55,17 @@ def dbt_tiktok_ads(
             f"{google_cloud_project}."
         )
 
+        # Buffered dbt global logging
+        return {
+            "status": "SUCCESS",
+            "stdout": result.stdout,
+            "stderr": result.stderr,
+        }
+
     except subprocess.CalledProcessError as e:
-        raise RuntimeError(
-            "❌ [DBT] Failed to execute dbt build for TikTok Ads "
-            f"{select} insights to Google Cloud Project "
-            f"{google_cloud_project} due to "
-            f"{e}."
-        ) from e
+        return {
+            "status": "FAILED",
+            "stdout": e.stdout,
+            "stderr": e.stderr,
+            "error": str(e),
+        }
