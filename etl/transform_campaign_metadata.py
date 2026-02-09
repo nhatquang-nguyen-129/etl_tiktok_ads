@@ -45,6 +45,7 @@ def transform_campaign_metadata(
 
     df = df.copy()
     df["platform"] = "TikTok"
+    df = df.rename(columns={"objective": "result_type"})
     df = df.assign(
         objective=df["campaign_name"].fillna("").str.split("_").str[0].fillna("unknown"),
         region=df["campaign_name"].fillna("").str.split("_").str[1].fillna("unknown"),
