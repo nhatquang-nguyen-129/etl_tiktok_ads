@@ -8,4 +8,3 @@ pipeline_tiktok_ads:
       dataset: "{{ env_var('COMPANY') }}_dataset_tiktok_api_mart"
       location: asia-southeast1
       threads: 2
-      
