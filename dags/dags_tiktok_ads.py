@@ -11,6 +11,7 @@ import time
 from dags._dags_campaign_insights import dags_campaign_insights
 from dags._dags_ad_insights import dags_ad_insights
 
+
 def dags_tiktok_ads(
     *,
     access_token: str,
@@ -26,13 +27,10 @@ def dags_tiktok_ads(
 
     print(
         "🔄 [DAGS] Triggering to update TikTok Ads insights for "
-        f"{advertiser_id} from "
-        f"{start_date} to "
-        f"{end_date} with " 
-        f"{max_workers} max_workers..."
+        f"{advertiser_id} from {start_date} to {end_date} "
+        f"with {max_workers} max_workers..."
     )
 
-    # Submit tasks
     tasks = {
         "campaign_insights": dags_campaign_insights,
         "ad_insights": dags_ad_insights,
@@ -40,28 +38,27 @@ def dags_tiktok_ads(
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         for name, fn in tasks.items():
-            print(
-                "🔄 [DAGS] Submitting task "
-                f"{name} to ThreadPoolExecutor..."
-            )
 
             buffer = io.StringIO()
             buffers[name] = buffer
 
-            future = executor.submit(
-                lambda fn=fn, buffer=buffer: (
-                    redirect_stdout(buffer),
-                    redirect_stderr(buffer),
-                    fn(
+            def _run_task(fn=fn, buffer=buffer):
+                original_stdout = sys.stdout
+                original_stderr = sys.stderr
+                try:
+                    sys.stdout = buffer
+                    sys.stderr = buffer
+                    return fn(
                         access_token=access_token,
                         advertiser_id=advertiser_id,
                         start_date=start_date,
                         end_date=end_date,
-                    ),
-                )[-1]
-            )
+                    )
+                finally:
+                    sys.stdout = original_stdout
+                    sys.stderr = original_stderr
 
-            futures[future] = name
+            futures[executor.submit(_run_task)] = name
 
         completed = set()
 
@@ -93,8 +90,7 @@ def dags_tiktok_ads(
                     print(f"{task:<30} | STATUS = RUNNING")
                 print("=" * 120)
 
-    total_elapsed = round(time.time() - start_time, 2)
     print(
         "✅ [DAGS] Successfully triggered to update TikTok Ads insights using "
-        f"ThreadPoolExecutor in {total_elapsed}s."
+        f"ThreadPoolExecutor in {round(time.time() - start_time, 2)}s."
     )

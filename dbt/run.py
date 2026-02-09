@@ -8,6 +8,7 @@ import subprocess
 
 def dbt_tiktok_ads(
     *,
+    google_cloud_project: str,
     select: str
 ):
     """
@@ -31,28 +32,30 @@ def dbt_tiktok_ads(
         "--select", select,
     ]
 
+    print(
+        "🔄 [DBT] Executing dbt build for TikTok Ads "
+        f"{select} insights to Google Cloud Project "
+        f"{google_cloud_project}..."
+    )
+
     try:
-        result = subprocess.run(
+        subprocess.run(
             cmd,
             cwd="dbt",
             env=os.environ,
             check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
         )
 
-        # Buffered dbt global logging
-        return {
-            "status": "SUCCESS",
-            "stdout": result.stdout,
-            "stderr": result.stderr,
-        }
+        print(
+            "✅ [DBT] Successfully executed dbt build for TikTok Ads "
+            f"{select} insights to Google Cloud Project "
+            f"{google_cloud_project}."
+        )
 
     except subprocess.CalledProcessError as e:
-        return {
-            "status": "FAILED",
-            "stdout": e.stdout,
-            "stderr": e.stderr,
-            "error": str(e),
-        }
+        raise RuntimeError(
+            "❌ [DBT] Failed to execute dbt build for TikTok Ads "
+            f"{select} insights to Google Cloud Project "
+            f"{google_cloud_project} due to "
+            f"{e}."
+        ) from e
