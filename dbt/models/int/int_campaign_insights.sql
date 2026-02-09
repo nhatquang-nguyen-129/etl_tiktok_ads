@@ -27,7 +27,7 @@ select
     campaign.campaign_name,
     campaign.advertiser_name,
     campaign.operation_status,
-    campaign.objective,
+    campaign.result_type,
 
     case
         when campaign.operation_status in (

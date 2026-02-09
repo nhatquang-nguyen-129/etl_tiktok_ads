@@ -28,7 +28,7 @@ select
     spend,
     
     result,
-    objective_type,
+    result_type,
     engaged_view_15s,
     purchase,
 
