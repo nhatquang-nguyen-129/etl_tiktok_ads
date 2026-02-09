@@ -35,7 +35,7 @@ def load_campaign_insights(
         f"{len(df)} row(s) of TikTok Ads campaign insights to Google BigQuery table "
         f"{direction}..."
         )
-    
+
     loader = internalGoogleBigqueryLoader()
 
     loader.load(
