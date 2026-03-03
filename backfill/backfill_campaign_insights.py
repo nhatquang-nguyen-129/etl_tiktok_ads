@@ -1,11 +1,11 @@
-from pathlib import Path
+import os
 import sys
+from pathlib import Path
 ROOT_FOLDER_LOCATION = Path(__file__).resolve().parents[1]
 sys.path.append(str(ROOT_FOLDER_LOCATION))
 
 import argparse
 from datetime import datetime
-import os
 
 from google.cloud import secretmanager
 from google.api_core.client_options import ClientOptions
@@ -23,47 +23,54 @@ if not all([
     DEPARTMENT,
     ACCOUNT,
 ]):
-    raise EnvironmentError("❌ [BACKFILL] Failed to execute TikTok Ads campaign insights update due to missing required environment variables.")
+    raise EnvironmentError("❌ [BACKFILL] Failed to execute TikTok Ads campaign insights backfill due to missing required environment variables.")
 
 def backfill():
     """
     Backfill TikTok Ads campaign insights
-    ---------
-    Workflow:
-        1. Resolve execution time window from MODE
-        2. Read & validate OS environment variables
+    ---
+    Principles:
+        1. Resolve execution time window form CLI argument --start_date and --end_date
+        2. Validate OS environment variables
         3. Load secrets from GCP Secret Manager
         4. Resolve advertiser_id and access_token
         5. Dispatch execution to DAG orchestrator
+    ---
     Return:
         None
     """
 
 # CLI arguments parser for manual date range
-    parser = argparse.ArgumentParser(description="Manual TikTok Ads ETL executor")
+    parser = argparse.ArgumentParser(
+        description="Manual TikTok Ads ETL executor"
+        )
+    
     parser.add_argument(
         "--start_date",
         required=True,
         help="Start date in YYYY-MM-DD format"
     )
+    
+    
     parser.add_argument(
         "--end_date",
         required=True,
         help="End date in YYYY-MM-DD format"
     )
+    
     args = parser.parse_args()
 
     try:
         start_date = datetime.strptime(args.start_date, "%Y-%m-%d").strftime("%Y-%m-%d")
         end_date = datetime.strptime(args.end_date, "%Y-%m-%d").strftime("%Y-%m-%d")
     except ValueError:
-        raise ValueError("❌ [BACKFILL] Failed to execute TikTok Ads campaign insights update due to start_date and end_date must be in YYYY-MM-DD format.")
+        raise ValueError("❌ [BACKFILL] Failed to execute TikTok Ads campaign insights backfill due to start_date and end_date must be in YYYY-MM-DD format.")
 
     if start_date > end_date:
-        raise ValueError("❌ [BACKFILL] Failed to execute TikTok Ads campaign insights update due to start_date must be less than or equal to end_date.")
+        raise ValueError("❌ [BACKFILL] Failed to execute TikTok Ads campaign insights backfill due to start_date must be less than or equal to end_date.")
 
     print(
-        "🔄 [BACKFILL] Triggering to execute TikTok Ads campaign insights update for "
+        "🔄 [BACKFILL] Triggering to execute TikTok Ads campaign insights backfill for "
         f"{ACCOUNT} account of "
         f"{DEPARTMENT} department in "
         f"{COMPANY} company from "
