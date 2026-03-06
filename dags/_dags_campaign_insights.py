@@ -231,8 +231,8 @@ def dags_campaign_insights(
         print(
             "🔄 [DAGS] Waiting "
             f"{wait_to_retry} second(s) before retrying TikTok Ads API "
-                f"{attempt}/{DAGS_CAMPAIGN_ATTEMPTS} attempt(s)..."
-            )
+            f"{attempt}/{DAGS_CAMPAIGN_ATTEMPTS} attempt(s)..."
+        )
         
         time.sleep(wait_to_retry)
 
@@ -265,7 +265,9 @@ def dags_campaign_insights(
     )
 
 # Materialization with dbt
-    print("🔄 [DAGS] Trigger to materialize TikTok Ads campaign insights with dbt...")
+    print(
+        "🔄 [DAGS] Trigger to materialize TikTok Ads campaign insights with dbt..."
+    )
     
     dbt_tiktok_ads(
         google_cloud_project=PROJECT,
