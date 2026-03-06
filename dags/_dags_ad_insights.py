@@ -196,7 +196,6 @@ def dags_ad_insights(
             f"{attempt}/{DAGS_AD_ATTEMPTS} attempt(s)..."
         )
 
-
         df_ad_metadata = extract_ad_metadata(
             access_token=access_token,
             advertiser_id=advertiser_id,
