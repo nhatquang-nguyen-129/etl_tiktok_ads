@@ -236,8 +236,8 @@ def dags_ad_insights(
         print(
             "🔄 [DAGS] Waiting "
             f"{wait_to_retry} second(s) before retrying TikTok Ads API "
-                f"{attempt}/{DAGS_AD_ATTEMPTS} attempt(s)..."
-            )
+            f"{attempt}/{DAGS_AD_ATTEMPTS} attempt(s)..."
+        )
         
         time.sleep(wait_to_retry)
 
@@ -415,7 +415,7 @@ def dags_ad_insights(
             "🔄 [DAGS] Waiting "
             f"{wait_to_retry} second(s) before retrying TikTok Ads API "
             f"{attempt}/{DAGS_CAMPAIGN_ATTEMPTS} attempt(s)..."
-            )
+        )
         
         time.sleep(wait_to_retry)
 
