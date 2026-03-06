@@ -3,7 +3,6 @@ import sys
 from pathlib import Path
 ROOT_FOLDER_LOCATION = Path(__file__).resolve().parents[2]
 sys.path.append(str(ROOT_FOLDER_LOCATION))
-sys.stdout.reconfigure(encoding="utf-8")
 
 from datetime import datetime, timedelta
 import pandas as pd
@@ -27,7 +26,6 @@ COMPANY = os.getenv("COMPANY")
 PROJECT = os.getenv("PROJECT")
 DEPARTMENT = os.getenv("DEPARTMENT")
 ACCOUNT = os.getenv("ACCOUNT")
-MODE = os.getenv("MODE")
 
 def dags_ad_insights(
     *,
@@ -36,6 +34,20 @@ def dags_ad_insights(
     start_date: str,
     end_date: str,
 ):
+    """
+    DAG Orchestration for TikTok Ads ad insights
+    ---
+    Principles:
+        1. Trigger TikTok Ads ad insights extraction
+        2. Transform TikTok Ads ad insights into validated schema
+        3. Load transformed TikTok Ads ad insights records into Google BigQuery
+        4. Set TikTok Ads API cooldown between each day
+        5. Execute dbt models for materialization
+    ---
+    Returns:
+        1. None:
+    """       
+
     print(
         "🔄 [DAGS] Trigger to update TikTok Ads ad insights with advertiser_id "
         f"{advertiser_id} from "
@@ -56,9 +68,9 @@ def dags_ad_insights(
         dags_split_date = dags_start_date.strftime("%Y-%m-%d")
 
         for attempt in range(1, DAGS_INSIGHTS_ATTEMPTS + 1):
-
-    # Extract            
             try:
+
+    # Extract
                 print(
                     "🔄 [DAGS] Trigger to extract TikTok Ads ad insights from advertiser_id "
                     f"{advertiser_id} at "
@@ -176,13 +188,15 @@ def dags_ad_insights(
     dfs_ad_metadata = []
 
     for attempt in range(1, DAGS_AD_ATTEMPTS + 1):
+
+    # Extract        
         print(
             "🔄 [DAGS] Trigger to extract TikTok Ads ad metadata for "
             f"{len(remaining_ad_ids)} ad_id(s) in "
             f"{attempt}/{DAGS_AD_ATTEMPTS} attempt(s)..."
         )
 
-    # Extract
+
         df_ad_metadata = extract_ad_metadata(
             access_token=access_token,
             advertiser_id=advertiser_id,
@@ -262,13 +276,14 @@ def dags_ad_insights(
     dfs_ad_creative = []
 
     for attempt in range(1, DAGS_CREATIVE_ATTEMPTS + 1):
+
+    # Extract
         print(
             "🔄 [DAGS] Trigger to extract TikTok Ads ad creative for advertiser_id "
             f"{advertiser_id} "
             f"{attempt}/{DAGS_CREATIVE_ATTEMPTS} attempts..."
         )
 
-    # Extract     
         try:
             df_ad_creative = extract_ad_creative(
                 access_token=access_token,
@@ -351,14 +366,15 @@ def dags_ad_insights(
     remaining_campaign_ids = list(total_campaign_ids)
     dfs_campaign_metadata = []
 
-    for attempt in range(1, DAGS_CAMPAIGN_ATTEMPTS + 1):
+    for attempt in range(1, DAGS_CAMPAIGN_ATTEMPTS + 1):    
+    
+    # Extract
         print(
             "🔄 [DAGS] Trigger to extract TikTok Ads campaign metadata for "
             f"{len(remaining_campaign_ids)} campaign_id(s) in "
             f"{attempt}/{DAGS_CAMPAIGN_ATTEMPTS} attempt(s)..."
         )
 
-    # Extract
         df_campaign_metadata = extract_campaign_metadata(
             access_token=access_token,
             advertiser_id=advertiser_id,
@@ -399,7 +415,7 @@ def dags_ad_insights(
         print(
             "🔄 [DAGS] Waiting "
             f"{wait_to_retry} second(s) before retrying TikTok Ads API "
-                f"{attempt}/{DAGS_CAMPAIGN_ATTEMPTS} attempt(s)..."
+            f"{attempt}/{DAGS_CAMPAIGN_ATTEMPTS} attempt(s)..."
             )
         
         time.sleep(wait_to_retry)
@@ -423,7 +439,7 @@ def dags_ad_insights(
 
     print(
         "🔄 [DAGS] Trigger to load TikTok Ads campaign metadata for "
-        f"{len(df_campaign_metadatas)} row(s) to"
+        f"{len(df_campaign_metadatas)} row(s) to "
         f"{_campaign_metadata_direction}..."       
     )
 
@@ -433,7 +449,9 @@ def dags_ad_insights(
     )
    
 # Materialization with dbt
-    print("🔄 [DAGS] Trigger to materialize TikTok Ads ad insights with dbt...")
+    print(
+        "🔄 [DAGS] Trigger to materialize TikTok Ads ad insights with dbt..."
+    )
     
     dbt_tiktok_ads(
         google_cloud_project=PROJECT,
