@@ -1,7 +1,7 @@
 import os
-from pathlib import Path
 import sys
-ROOT_FOLDER_LOCATION = Path(__file__).resolve().parents[0]
+from pathlib import Path
+ROOT_FOLDER_LOCATION = Path(__file__).resolve().parents[1]
 sys.path.append(str(ROOT_FOLDER_LOCATION))
 
 from datetime import datetime, timedelta
@@ -31,16 +31,16 @@ def main():
     """
     Main TikTok Ads entrypoint
     ---------
-    Workflow:
+    Principles:
         1. Resolve execution time window from MODE
         2. Read & validate OS environment variables
         3. Load secrets from GCP Secret Manager
         4. Resolve advertiser_id and access_token
         5. Dispatch execution to DAG orchestrator
-    Return:
+    Returns:
         None
     """
-    
+
     print(
         "🔄 [MAIN] Triggering to update TikTok Ads for "
         f"{ACCOUNT} account of "
@@ -89,7 +89,9 @@ def main():
 
 # Initialize Google Secret Manager
     try:
-        print("🔍 [MAIN] Initialize Google Secret Manager client...")
+        print(
+            "🔍 [MAIN] Initialize Google Secret Manager client..."
+        )
 
         google_secret_client = secretmanager.SecretManagerServiceClient(
             client_options=ClientOptions(
@@ -97,7 +99,9 @@ def main():
             )
         )
 
-        print("✅ [MAIN] Successfully initialized Google Secret Manager client.")
+        print(
+            "✅ [MAIN] Successfully initialized Google Secret Manager client."
+        )
     
     except Exception as e:
         raise RuntimeError(
@@ -105,7 +109,7 @@ def main():
             f"{e}."
         )
         
-# Resolve advertiser from Google Secret Manager
+# Resolve advertiser_id from Google Secret Manager
     try:
         secret_account_id = (
             f"{COMPANY}_secret_{DEPARTMENT}_tiktok_account_id_{ACCOUNT}"
@@ -155,7 +159,9 @@ def main():
         )
         access_token = secret_token_response.payload.data.decode("utf-8")
         
-        print("✅ [MAIN] Successfully retrieved TikTok Ads access token from Google Secret Manager.")
+        print(
+            "✅ [MAIN] Successfully retrieved TikTok Ads access token from Google Secret Manager."
+        ) 
 
     except Exception as e:
         raise RuntimeError(
