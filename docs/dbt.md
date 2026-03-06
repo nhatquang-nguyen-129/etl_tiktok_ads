@@ -1,60 +1,137 @@
-# DAGs for TikTok Ads
+# Data Build Tool for TikTok Ads
 
 ## Purpose
 
-- Execute TikTok Ads DAGs using **predefined runtime configurations**
+- Use **dbt** to build TikTok Ads analytics-ready **materialized tables** in **Google BigQuery**
 
-- Resolve **execution time window** indirectly via `main.py` instead of `--start_date` and `--end_date` via argparse
+- Used **dbt** only for **SQL transformations** and all ETL processes are handled upstream
 
-- Designed primarily for **production deployment** on Cloud Run
+- Join TikTok Ads campaign insights fact tables with campaign metadata dim table
 
-- Automatically load **required secrets** from Google Secret Manager
+- Join TikTok Ads ad insights fact tables with campaign metadata/ad metadata/ad creative dim tables
 
-- Dispatch execution to the **DAG orchestrator** without exposing manual entrypoints
-
----
-
-## Execution
-
-### Runtime Contract
-
- - The following environment variables `COMPANY`, `PROJECT`, `DEPARTMENT` and `ACCOUNT` must be provided
-
-- The DAGS execution time logic is controlled externally by `main.py` with predefined runtime modes
-
-- The resolved execution context is then passed to `dags_tiktok_ads`
+- Define final analytical grain and manage model dependencies using `ref()`
 
 ---
 
-### Secret Management
+## Install
 
-- `main.py` initializes Google Secret Manager client to resolves required secrets
+### Activate Python venv
 
-- `main.py` retrieves `secret_ac_id` from `{COMPANY}_secret_{DEPARTMENT}_facebook_account_id_{ACCOUNT}`
+- Create Python virtual environment if `venv\` folder not exists
+```bash
+python -m venv venv
+```
 
-- `main.py` retrieves `secret_account_name` from `projects/{PROJECT}/secrets/{secret_account_id}/versions/latest`
-
-- `main.py` retrieves `secret_token_id` from `{COMPANY}_secret_all_facebook_token_access_user`
-
-- `main.py` retrieves `secret_token_name ` from `projects/{PROJECT}/secrets/{secret_token_id}/versions/latest`
+- Activate Python virtual environment and check `(venv)` in the terminal
+```bash
+venv/scripts/activate
+```
 
 ---
 
-### Production Deployment
+### Install dbt adapter for Google BigQuery
 
-- This runtime is intended to run inside `Cloud Run` and triggered by `Cloud Scheduler`
+- Install dbt adapter for Google BigQuery using the terminal
+```bash
+pip install dbt-core dbt-bigquery
+```
 
-- This runtime is technically possible for local execution but not recommended
+- Verify installation and check installed dbt version
+```bash
+dbt --version
+```
 
-- For manual historical reprocessing, use the `Backfill` module instead
+---
 
-- Run DAGs for specific `MODE` using CLI
+## Structure
+
+### Models folder
+
+- `models` is root folder for all dbt models and all logical separation by transformation stage
+
+- `models/stg` is the staging layer providing a clean abstraction over ETL output tables and materialized as `ephemeral` with example:
+```bash
+{{ config(
+    materialized='ephemeral',
+    tags=['stg', 'tiktok', 'campaign']
+) }}
+```
+
+- `models/int` is the intermediate layer with the responsibilty to combine staging models then join with dimensions and materialized as `ephemeral` with example:
+```bash
+{{ config(
+    materialized='ephemeral',
+    tags=['int', 'tiktok', 'campaign']
+) }}
+```
+
+- `models/mart` is the final materialization layer and materialized as `table` with example:
+```bash
+{{ config(
+    materialized='table',
+    tags=['mart', 'tiktok', 'campaign']
+) }}
+```
+
+---
+
+### Config file
+
+- `dbt_project.yml` is a required file for all dbt project which contains project operation instructions
+
+- `profiles.yml` is a required file which contains the connection details for the data warehouse
+
+---
+
+## Deployment
+
+### Manual Deployment
+
+- Complie only with no execution
+```bash
+dbt compile
+```
+
+- Run all models
+```bash
+dbt build
+```
+
+- Run only campaign insights
 ```bash
 $env:PROJECT="your-gcp-project"
 $env:COMPANY="your-company-in-short"
 $env:DEPARTMENT="your-department"
 $env:ACCOUNT="your-account"
-$env:MODE="your-time-window"
 
-python main.py
+dbt build `
+  --project-dir dbt `
+  --profiles-dir dbt `
+  --select tag:campaign
+```
+
+- Run only ad insights
+```bash
+$env:PROJECT="your-gcp-project"
+$env:COMPANY="your-company-in-short"
+$env:DEPARTMENT="your-department"
+$env:ACCOUNT="your-account"
+
+dbt build `
+  --project-dir dbt `
+  --profiles-dir dbt `
+  --select tag:ad
+```
+
+---
+
+### Deployment with DAGs
+
+- Using Python `subprocess` to call dbt for each stream
+```bash
+dbt_tiktok_ads(
+    google_cloud_project=PROJECT,
+    select="campaign",
+)
 ```
