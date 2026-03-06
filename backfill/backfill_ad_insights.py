@@ -36,7 +36,7 @@ def backfill():
         4. Resolve advertiser_id and access_token
         5. Dispatch execution to DAG orchestrator
     ---
-    Return:
+    Returns:
         None
     """
 
