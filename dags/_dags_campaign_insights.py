@@ -3,7 +3,6 @@ import sys
 from pathlib import Path
 ROOT_FOLDER_LOCATION = Path(__file__).resolve().parents[2]
 sys.path.append(str(ROOT_FOLDER_LOCATION))
-sys.stdout.reconfigure(encoding="utf-8")
 
 from datetime import datetime, timedelta
 import pandas as pd
@@ -22,7 +21,6 @@ COMPANY = os.getenv("COMPANY")
 PROJECT = os.getenv("PROJECT")
 DEPARTMENT = os.getenv("DEPARTMENT")
 ACCOUNT = os.getenv("ACCOUNT")
-MODE = os.getenv("MODE")
 
 def dags_campaign_insights(
     *,
@@ -31,6 +29,20 @@ def dags_campaign_insights(
     start_date: str,
     end_date: str,
 ):
+    """
+    DAG Orchestration for TikTok Ads campaign insights
+    ---
+    Principles:
+        1. Trigger TikTok Ads campaign insights extraction
+        2. Transform TikTok Ads campaign insights into validated schema
+        3. Load transformed TikTok Ads campaign insights records into Google BigQuery
+        4. Set TikTok Ads API cooldown between each day
+        5. Execute dbt models for materialization
+    ---
+    Returns:
+        1. None:
+    """    
+
     print(
         "🔄 [DAGS] Trigger to update TikTok Ads campaign insights with advertiser_id "
         f"{advertiser_id} from "
@@ -51,9 +63,9 @@ def dags_campaign_insights(
         dags_split_date = dags_start_date.strftime("%Y-%m-%d")
 
         for attempt in range(1, DAGS_INSIGHTS_ATTEMPTS + 1):
-
-    # Extract            
             try:
+
+    # Extract
                 print(
                     "🔄 [DAGS] Trigger to extract TikTok Ads campaign insights from advertiser_id "
                     f"{advertiser_id} at "
@@ -171,13 +183,14 @@ def dags_campaign_insights(
     dfs_campaign_metadata = []
 
     for attempt in range(1, DAGS_CAMPAIGN_ATTEMPTS + 1):
+
+    # Extract
         print(
             "🔄 [DAGS] Trigger to extract TikTok Ads campaign metadata for "
             f"{len(remaining_campaign_ids)} campaign_id(s) in "
             f"{attempt}/{DAGS_CAMPAIGN_ATTEMPTS} attempt(s)..."
         )
 
-    # Extract
         df_campaign_metadata = extract_campaign_metadata(
             access_token=access_token,
             advertiser_id=advertiser_id,

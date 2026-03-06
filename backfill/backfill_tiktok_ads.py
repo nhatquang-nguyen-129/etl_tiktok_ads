@@ -156,7 +156,9 @@ def backfill():
         )
         access_token = secret_token_response.payload.data.decode("utf-8")
         
-        print("✅ [BACKFILL] Successfully retrieved TikTok Ads access token from Google Secret Manager.")
+        print(
+            "✅ [BACKFILL] Successfully retrieved TikTok Ads access token from Google Secret Manager."
+        )
 
     except Exception as e:
         raise RuntimeError(
