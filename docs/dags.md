@@ -4,7 +4,7 @@
 
 - Execute TikTok Ads DAGs using **predefined runtime configurations**
 
-- Resolve **execution time window** indirectly via `main.py` instead of `--input_month` via argparse
+- Resolve **execution time window** indirectly via `main.py` instead of `--start_date` and `--end_date` via argparse
 
 - Designed primarily for **production deployment** on Cloud Run
 

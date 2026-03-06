@@ -1,143 +1,60 @@
-# Data Build Tool for TikTok Ads SQL Materialization
+# DAGs for TikTok Ads
 
 ## Purpose
 
-- Use **dbt** to build TikTok analytics-ready **materialized tables** in **Google BigQuery**
+- Execute TikTok Ads DAGs using **predefined runtime configurations**
 
-- Used **dbt** only for **SQL transformations** and all ELT processes are handled upstream
+- Resolve **execution time window** indirectly via `main.py` instead of `--start_date` and `--end_date` via argparse
 
-- Join TikTok Ads campaign insights fact tables with campaign metadata dim table
+- Designed primarily for **production deployment** on Cloud Run
 
-- Join TikTok Ads ad insights fact tables with campaign metadata/adset metadata/ad metadata/ad creative dim tables
+- Automatically load **required secrets** from Google Secret Manager
 
-- Define final analytical grain and manage model dependencies using `ref()`
-
----
-
-## Install
-
-### Switch to Python 3.13 Interpreter
-- Explicitly choose the correct Python interpreter if multiple versions was installed
-
-- Create a Python virtual environment using Python 3.13 interpreter when run from the root folder
-```bash
-& "C:\Users\ADMIN\AppData\Local\Programs\Python\Python313\python.exe" -m venv venv
-```
-
-- Check available Python interpreter if there is any uncertainty by press `Ctrl + Shift + P` then select `Python: Select Interpreter`
-
-- Activate Python virtual environment and check `(venv)` in the terminal
-```bash
-venv/scripts/activate
-```
-
-- Verify Python virtual environment and check Python Interpreter version
-```bash
-python --version
-```
+- Dispatch execution to the **DAG orchestrator** without exposing manual entrypoints
 
 ---
 
-### Install dbt adapter for Google BigQuery
+## Execution
 
-- Install dbt adapter for Google BigQuery using the terminal
-```bash
-pip install dbt-core dbt-bigquery
-```
+### Runtime Contract
 
-- Verify installation and check installed dbt version
-```bash
-dbt --version
-```
+ - The following environment variables `COMPANY`, `PROJECT`, `DEPARTMENT` and `ACCOUNT` must be provided
+
+- The DAGS execution time logic is controlled externally by `main.py` with predefined runtime modes
+
+- The resolved execution context is then passed to `dags_tiktok_ads`
 
 ---
 
-## Structure
+### Secret Management
 
-### Models folder
+- `main.py` initializes Google Secret Manager client to resolves required secrets
 
-- `models` is root folder for all dbt models and all logical separation by transformation stage
+- `main.py` retrieves `secret_ac_id` from `{COMPANY}_secret_{DEPARTMENT}_facebook_account_id_{ACCOUNT}`
 
-- `models/stg` is the staging layer providing a clean abstraction over ETL output tables and materialized as `ephemeral` with example:
-```bash
-{{ config(
-    materialized='ephemeral',
-    tags=['stg', 'tiktok', 'campaign']
-) }}
-```
+- `main.py` retrieves `secret_account_name` from `projects/{PROJECT}/secrets/{secret_account_id}/versions/latest`
 
-- `models/int` is the intermediate layer with the responsibilty to combine staging models then join with dimensions and materialized as `ephemeral` with example:
-```bash
-{{ config(
-    materialized='ephemeral',
-    tags=['int', 'tiktok', 'campaign']
-) }}
-```
+- `main.py` retrieves `secret_token_id` from `{COMPANY}_secret_all_facebook_token_access_user`
 
-- `models/mart` is the final materialization layer and materialized as `table` with example:
-```bash
-{{ config(
-    materialized='table',
-    tags=['mart', 'tiktok', 'campaign']
-) }}
-```
+- `main.py` retrieves `secret_token_name ` from `projects/{PROJECT}/secrets/{secret_token_id}/versions/latest`
 
 ---
 
-### Config file
+### Production Deployment
 
-- `dbt_project.yml` is a required file for all dbt project which contains project operation instructions
+- This runtime is intended to run inside `Cloud Run` and triggered by `Cloud Scheduler`
 
-- `profiles.yml` is a required file which contains the connection details for the data warehouse
+- This runtime is technically possible for local execution but not recommended
 
----
+- For manual historical reprocessing, use the `Backfill` module instead
 
-## Deployment
-
-### Manual Deployment
-
-- Complie only with no execution
+- Run DAGs for specific `MODE` using CLI
 ```bash
-dbt compile
-```
+$env:PROJECT="your-gcp-project"
+$env:COMPANY="your-company-in-short"
+$env:DEPARTMENT="your-department"
+$env:ACCOUNT="your-account"
+$env:MODE="your-time-window"
 
-- Run all models
-```bash
-dbt build
-```
-
-- Run only campaign insights
-```bash
-$env:PROJECT="seer-digital-ads"
-$env:COMPANY="kids"
-$env:DEPARTMENT="marketing"
-$env:ACCOUNT="main"
-
-dbt build `
-  --project-dir dbt `
-  --profiles-dir dbt `
-  --select tag:campaign
-```
-
-- Run only ad insights
-```bash
-$env:PROJECT="seer-digital-ads"
-$env:COMPANY="kids"
-$env:DEPARTMENT="marketing"
-$env:ACCOUNT="main"
-
-dbt build `
-  --project-dir dbt `
-  --profiles-dir dbt `
-  --select tag:ad
-```
-
-### Deployment with DAGs
-
-- Using Python `subprocess` to call dbt for each stream
-```bash
-dbt_tiktok_ads(
-    google_cloud_project=PROJECT,
-    select="campaign",
-)
+python main.py
 ```
