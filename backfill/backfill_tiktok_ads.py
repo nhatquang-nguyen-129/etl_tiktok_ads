@@ -36,7 +36,7 @@ def backfill():
         4. Resolve advertiser_id and access_token
         5. Dispatch execution to DAG orchestrator
     ---
-    Return:
+    Returns:
         None
     """
 
@@ -96,7 +96,7 @@ def backfill():
             f"{e}."
         )
         
-# Resolve advertiser from Google Secret Manager
+# Resolve advertiser_id from Google Secret Manager
     try:
         secret_account_id = (
             f"{COMPANY}_secret_{DEPARTMENT}_tiktok_account_id_{ACCOUNT}"
