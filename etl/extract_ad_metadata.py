@@ -39,7 +39,7 @@ def extract_ad_metadata(
 
     rows: list[dict] = []
     
-    failed_ad_ids: list[str] = []
+    ad_id_has_retryable_error = False
 
     if not ad_ids:
 
@@ -56,6 +56,7 @@ def extract_ad_metadata(
     payload = {"advertiser_ids": [advertiser_id]}
 
     try:
+
         print(
             "🔍 [EXTRACT] Extracting TikTok Ads advertiser_name for advertiser_id "
             f"{advertiser_id}..."
@@ -122,10 +123,12 @@ def extract_ad_metadata(
         )        
 
     except requests.HTTPError as e:
+        
         status = e.response.status_code if e.response else None
 
         # Retryable HTTP request error 
         if status and status >= 500:
+            
             error = RuntimeError(
                 "⚠️ [EXTRACT] Failed to extract TikTok Ads advertiser_name for advertiser_id "
                 f"{advertiser_id} due to HTTP error "
@@ -143,8 +146,9 @@ def extract_ad_metadata(
         error.retryable = False
         raise error from e
 
-        # Unknown non-retryable error
     except Exception as e:
+
+        # Unknown non-retryable error        
         error = RuntimeError(
             "❌ [EXTRACT] Failed to extract TikTok Ads advertiser_name for advertiser_id "
             f"{advertiser_id} due to "
@@ -172,8 +176,7 @@ def extract_ad_metadata(
 
     print(
         "🔍 [EXTRACT] Extracting TikTok Ads ad metadata for advertiser_id "
-        f"{advertiser_id} with "
-        f"{len(ad_ids)} ad_id(s)..."
+        f"{advertiser_id} with {len(ad_ids)} ad_id(s)..."
     )
 
     for ad_id in ad_ids:
@@ -219,7 +222,7 @@ def extract_ad_metadata(
                     50000,
                     50001
                 }:
-                    failed_ad_ids.append(ad_id)
+                    ad_id_has_retryable_error = True
 
                     print(
                         "⚠️ [EXTRACT] Failed to extract TikTok Ads ad metadata for ad_id "
@@ -228,29 +231,14 @@ def extract_ad_metadata(
                         f"{code} then this request is eligible to retry."
                     )
 
-                    rows.append(
-                        {
-                            "advertiser_id": advertiser_id,
-                            "advertiser_name": advertiser_name,
-                            "ad_id": ad_id,
-                            "ad_name": None,
-                            "adgroup_id": None,
-                            "adgroup_name": None,
-                            "campaign_id": None,
-                            "campaign_name": None,
-                            "operation_status": None,
-                            "create_time": None,
-                            "ad_format": None,
-                            "optimization_event": None,
-                            "video_id": None,
-                        }
-                    )
-
                     continue
 
+        # Non-retryable API error
                 error = RuntimeError(
-                    "❌ [EXTRACT] Failed to extract TikTok ad metadata for ad_id "
-                    f"{ad_id} due to API error {message}."
+                    "❌ [EXTRACT] Failed to extract TikTok Ads ad metadata for ad_id "
+                    f"{ad_id} due to API error "
+                    f"{message} with error code "
+                    f"{code} then this request is not eligible to retry."
                 )
                 error.retryable = False
                 raise error
@@ -279,83 +267,59 @@ def extract_ad_metadata(
                     }
                 )
 
-            else:
-
-                rows.append(
-                    {
-                        "advertiser_id": advertiser_id,
-                        "advertiser_name": advertiser_name,
-                        "ad_id": ad_id,
-                            "ad_name": None,
-                            "adgroup_id": None,
-                            "adgroup_name": None,
-                            "campaign_id": None,
-                            "campaign_name": None,
-                            "operation_status": None,
-                            "create_time": None,
-                            "ad_format": None,
-                            "optimization_event": None,
-                            "video_id": None,
-                        }
-                    )
-
         except requests.HTTPError as e:
-
+            
             status = e.response.status_code if e.response else None
 
+        # Retryable HTTP request error 
             if status and status >= 500:
 
-                failed_ad_ids.append(ad_id)
+                ad_id_has_retryable_error = True
 
                 print(
-                    "⚠️ [EXTRACT] Retryable error for ad_id "
-                    f"{ad_id} due to HTTP {status}"
-                )
-
-                rows.append(
-                    {
-                        "advertiser_id": advertiser_id,
-                        "advertiser_name": advertiser_name,
-                        "ad_id": ad_id,
-                        "ad_name": None,
-                        "adgroup_id": None,
-                        "adgroup_name": None,
-                        "campaign_id": None,
-                        "campaign_name": None,
-                        "operation_status": None,
-                        "create_time": None,
-                        "ad_format": None,
-                        "optimization_event": None,
-                        "video_id": None,
-                    }
+                    "⚠️ [EXTRACT] Failed to extract TikTok Ads ad metadata for ad_id "
+                    f"{ad_id} due to HTTP error "
+                    f"{status} then this request is eligible to retry."
                 )
 
                 continue
 
+        # Non-retryable HTTP request error
             error = RuntimeError(
-                "❌ [EXTRACT] Failed to extract TikTok ad metadata for ad_id "
-                f"{ad_id} due to HTTP error {status}."
+                "❌ [EXTRACT] Failed to extract TikTok Ads ad metadata for ad_id "
+                f"{ad_id} due to HTTP error "
+                f"{status} then this request is not eligible to retry."
             )
             error.retryable = False
             raise error from e
 
         except Exception as e:
-
+        
+        # Unknown non-retryable error
             error = RuntimeError(
-                "❌ [EXTRACT] Failed to extract TikTok ad metadata for ad_id "
+                "❌ [EXTRACT] Failed to extract TikTok Ads ad metadata for ad_id "
                 f"{ad_id} due to "
                 f"{e}."
             )
             error.retryable = False
             raise error from e
 
+    if ad_id_has_retryable_error:
+
+        error = RuntimeError(
+            "⚠️ [EXTRACT] Failed to extract TikTok Ads ad metadata for "
+            f"{len(ad_ids)} ad_id(s) from advertiser_id "
+            f"{advertiser_id} due to retryable error(s) then this request is eligible to retry."
+        )
+        error.retryable = True
+        raise error
+
     df = pd.DataFrame(rows)
 
     print(
         "✅ [EXTRACT] Successfully extracted "
-        f"{len(df)}/{len(ad_ids)} row(s) of TikTok ad metadata for advertiser_id "
-        f"{advertiser_id} with "
-        f"{len(failed_ad_ids)} failed ad_id(s)."
+        f"{len(df)}/{len(ad_ids)} row(s) of TikTok Ads ad metadata for advertiser_id "
+        f"{advertiser_id}."
     )
 
     return df
