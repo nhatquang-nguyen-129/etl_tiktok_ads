@@ -33,11 +33,12 @@ def extract_ad_insights(
         "Content-Type": "application/json",
     }
 
-    timeout = (30, 600)
-
-    ad_insights_url = (
-        "https://business-api.tiktok.com/open_api/v1.3/report/integrated/get/"
+    timeout = (
+        30, 
+        600
     )
+
+    ad_insights_url = "https://business-api.tiktok.com/open_api/v1.3/report/integrated/get/"
 
     dimensions = [
         "ad_id",
@@ -72,6 +73,7 @@ def extract_ad_insights(
 
     records = []
 
+    # Make TikTok Ads API call for ad insights
     print(
         "🔍 [EXTRACT] Extracting TikTok Ads ad insights for advertiser_id "
         f"{advertiser_id} from "
@@ -92,6 +94,53 @@ def extract_ad_insights(
             resp.raise_for_status()
             data = resp.json()
 
+            if data.get("code") != 0:
+
+                code = data.get("code")
+                message = data.get("message")
+
+        # Expired token
+                if code in {
+                    40100, 
+                    40101
+                }:
+                    error = RuntimeError(
+                        "❌ [EXTRACT] Failed to extract TikTok Ads ad insights for advertiser_id "
+                        f"{advertiser_id} due to expired or invalid access token."
+                    )
+                    error.retryable = False
+                    raise error
+
+        # Retryable API error
+                if code in {
+                    40102, 
+                    50000, 
+                    50001
+                }:
+                    error = RuntimeError(
+                        "⚠️ [EXTRACT] Failed to extract TikTok Ads ad insights for advertiser_id "
+                        f"{advertiser_id} from "
+                        f"{start_date} to "
+                        f"{end_date} due to API error "
+                        f"{message} with error code "
+                        f"{code} then this request is eligible to retry."
+                    )
+                    error.retryable = True
+                    raise error
+
+        # Non-retryable API error
+                error = RuntimeError(
+                    "❌ [EXTRACT] Failed to extract TikTok Ads ad insights for advertiser_id "
+                    f"{advertiser_id} from "
+                    f"{start_date} to "
+                    f"{end_date} due to API error "
+                    f"{message} with error code "
+                    f"{code} then this request is not eligible to retry."
+                )
+                error.retryable = False
+                raise error
+
+        # Retryable request timeout error
         except requests.exceptions.Timeout as e:
             error = RuntimeError(
                 "⚠️ [EXTRACT] Failed to extract TikTok Ads ad insights for advertiser_id "
@@ -102,6 +151,7 @@ def extract_ad_insights(
             error.retryable = True
             raise error from e
 
+        # Retryable request connection error
         except requests.exceptions.ConnectionError as e:
             error = RuntimeError(
                 "⚠️ [EXTRACT] Failed to extract TikTok Ads ad insights for advertiser_id "
@@ -115,6 +165,7 @@ def extract_ad_insights(
         except requests.exceptions.HTTPError as e:
             status = e.response.status_code if e.response else None
 
+        # Retryable HTTP request error   
             if status and status >= 500:
                 error = RuntimeError(
                     "⚠️ [EXTRACT] Failed to extract TikTok Ads ad insights for advertiser_id "
@@ -126,6 +177,7 @@ def extract_ad_insights(
                 error.retryable = True
                 raise error from e
 
+        # Non-retryable HTTP request error
             error = RuntimeError(
                 "❌ [EXTRACT] Failed to extract TikTok Ads ad insights for advertiser_id "
                 f"{advertiser_id} from "
@@ -136,6 +188,7 @@ def extract_ad_insights(
             error.retryable = False
             raise error from e
 
+        # Unknown non-retryable error 
         except Exception as e:
             error = RuntimeError(
                 "❌ [EXTRACT] Failed to extract TikTok Ads ad insights for advertiser_id "
@@ -146,46 +199,6 @@ def extract_ad_insights(
             )
             error.retryable = False
             raise error from e
-
-        # TikTok API error handling
-        if data.get("code") != 0:
-
-            code = data.get("code")
-            message = data.get("message")
-
-            # Expired token
-            if code in {40100, 40101}:
-                error = RuntimeError(
-                    "❌ [EXTRACT] Failed to extract TikTok Ads ad insights for advertiser_id "
-                    f"{advertiser_id} due to expired or invalid access token."
-                )
-                error.retryable = False
-                raise error
-
-            # Retryable API error
-            if code in {40102, 50000, 50001}:
-                error = RuntimeError(
-                    "⚠️ [EXTRACT] Failed to extract TikTok Ads ad insights for advertiser_id "
-                    f"{advertiser_id} from "
-                    f"{start_date} to "
-                    f"{end_date} due to API error "
-                    f"{message} with error code {code} "
-                    "then this request is eligible to retry."
-                )
-                error.retryable = True
-                raise error
-
-            # Non-retryable API error
-            error = RuntimeError(
-                "❌ [EXTRACT] Failed to extract TikTok Ads ad insights for advertiser_id "
-                f"{advertiser_id} from "
-                f"{start_date} to "
-                f"{end_date} due to API error "
-                f"{message} with error code {code} "
-                "then this request is not eligible to retry."
-            )
-            error.retryable = False
-            raise error
 
         batch = data.get("data", {}).get("list", [])
         records.extend(batch)
