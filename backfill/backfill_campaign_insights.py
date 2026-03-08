@@ -163,7 +163,7 @@ def backfill():
     
     except Exception as e:
         raise RuntimeError(
-            "❌ [BACKFILL] Failed to retrieve TikTok Ads access token from Google Secret Manager due to "
+        "❌ [BACKFILL] Failed to retrieve TikTok Ads access token from Google Secret Manager due to "
             f"{e}."
         )        
    
