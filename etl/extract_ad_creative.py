@@ -25,7 +25,7 @@ def extract_ad_creative(
             Flattened ad creative records
     """
 
-    # Make TikTok Ads API call for ad creative
+    # Validate input
     headers = {
         "Access-Token": access_token,
         "Content-Type": "application/json",
@@ -44,6 +44,7 @@ def extract_ad_creative(
     page_size = 100
     pagination_continue = True
 
+    # Make TikTok Ads API call for ad creative
     print(
         "🔍 [EXTRACT] Extracting TikTok Ads ad creative for advertiser_id "
         f"{advertiser_id}..."
