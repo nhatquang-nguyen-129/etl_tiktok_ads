@@ -27,7 +27,7 @@ def load_ad_creative(
     """      
 
     if df.empty:
-        print("⚠️ [LOADER] Empty TikTok Ads ad creative Dataframe then loading will be suspended.")
+        print("⚠️ [LOADER] Empty TikTok Ads ad creative then loading will be suspended.")
         return
 
     print(

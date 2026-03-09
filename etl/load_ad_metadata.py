@@ -14,14 +14,14 @@ def load_ad_metadata(
 ) -> None:
     """
     Load TikTok Ads ad metadata
-    ----------------------
-    Workflow:
+    ---
+    Principles:
         1. Validate input DataFrame
         2. Validate output direction for Google BigQuery
         3. Set primary key(s) to advertiser_id and ad_id
         4. Use UPSERT mode with temporary table for deduplication
         5. Make internalGoogleBigQueryLoader API call
-    ---------
+    ---
     Returns:
         None
     """
