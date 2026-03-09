@@ -142,6 +142,7 @@ def extract_ad_insights(
 
         # Retryable request timeout error
         except requests.exceptions.Timeout as e:
+            
             error = RuntimeError(
                 "⚠️ [EXTRACT] Failed to extract TikTok Ads ad insights for advertiser_id "
                 f"{advertiser_id} from "
@@ -153,6 +154,7 @@ def extract_ad_insights(
 
         # Retryable request connection error
         except requests.exceptions.ConnectionError as e:
+            
             error = RuntimeError(
                 "⚠️ [EXTRACT] Failed to extract TikTok Ads ad insights for advertiser_id "
                 f"{advertiser_id} from "
@@ -163,6 +165,7 @@ def extract_ad_insights(
             raise error from e
 
         except requests.exceptions.HTTPError as e:
+            
             status = e.response.status_code if e.response else None
 
         # Retryable HTTP request error   
@@ -190,6 +193,7 @@ def extract_ad_insights(
 
         # Unknown non-retryable error 
         except Exception as e:
+            
             error = RuntimeError(
                 "❌ [EXTRACT] Failed to extract TikTok Ads ad insights for advertiser_id "
                 f"{advertiser_id} from "
