@@ -200,7 +200,9 @@ def extract_ad_insights(
             error.retryable = False
             raise error from e
 
-        batch = data.get("data", {}).get("list", [])
+        block = data.get("data") or {}
+        batch = block.get("list", [])
+
         records.extend(batch)
 
         if len(batch) < payload["page_size"]:
