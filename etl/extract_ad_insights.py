@@ -14,14 +14,14 @@ def extract_ad_insights(
 ) -> pd.DataFrame:
     """
     Extract TikTok Ads ad insights
-    ---------
+    ---
     Principles:
         1. Validate input advertiser_id
         2. Validate input start_date and end_date
         3. Make API call for report/integrated/get endpoint
         4. Append extracted JSON data to list[dict]
         5. Enforce List[dict] to DataFrame
-    ---------
+    ---
     Returns:
         1. DataFrame:
             Flattened ad insights records

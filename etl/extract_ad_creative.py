@@ -147,14 +147,14 @@ def extract_ad_creative(
         block = data.get("data") or {}
         batch = block.get("list", [])
 
-        for video in batch:
+        for record in batch:
             rows.append(
                 {
                     "advertiser_id": advertiser_id,
-                    "video_id": video.get("video_id"),
-                    "video_cover_url": video.get("video_cover_url"),
-                    "preview_url": video.get("preview_url"),
-                    "create_time": video.get("create_time"),
+                    "video_id": record.get("video_id"),
+                    "video_cover_url": record.get("video_cover_url"),
+                    "preview_url": record.get("preview_url"),
+                    "create_time": record.get("create_time"),
                 }
             )
 
