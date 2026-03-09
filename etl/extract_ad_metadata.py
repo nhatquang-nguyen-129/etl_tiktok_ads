@@ -13,14 +13,14 @@ def extract_ad_metadata(
 ) -> pd.DataFrame:
     """
     Extract TikTok Ads ad metadata
-    ---------
+    ---
     Principles:
         1. Validate input ad_ids
         2. Make API call for v1.3/advertiser/info
-        2. Make API call for v1.3/ad/get
-        3. Append extracted JSON data to list[dict]
-        4. Enforce List[dict] to DataFrame
-    ---------
+        3. Make API call for v1.3/ad/get
+        4. Append extracted JSON data to list[dict]
+        5. Enforce List[dict] to DataFrame
+    ---
     Returns:
         DataFrame:
             Flattened ad metadata records
@@ -223,6 +223,7 @@ def extract_ad_metadata(
                     50000,
                     50001
                 }:
+                    
                     ad_id_has_retryable_error = True
 
                     print(
@@ -244,11 +245,12 @@ def extract_ad_metadata(
                 error.retryable = False
                 raise error
 
-            ad_list = data.get("data", {}).get("list", [])
+            block = data.get("data") or {}
+            batch = block.get("list", [])
 
-            if ad_list:
+            if batch:
 
-                ad = ad_list[0]
+                ad = batch[0]
 
                 rows.append(
                     {
