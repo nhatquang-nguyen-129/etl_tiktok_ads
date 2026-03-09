@@ -14,14 +14,14 @@ def extract_campaign_insights(
 ) -> pd.DataFrame:
     """
     Extract TikTok Ads campaign insights
-    ---------
+    ---
     Principles:
         1. Validate input advertiser_id
         2. Validate input start_date and end_date
         3. Make API call for report/integrated/get endpoint
         4. Append extracted JSON data to list[dict]
         5. Enforce List[dict] to DataFrame
-    ---------
+    ---
     Returns:
         DataFrame:
             Flattened campaign insights records
@@ -142,6 +142,7 @@ def extract_campaign_insights(
 
         # Retryable request timeout error
         except requests.exceptions.Timeout as e:
+            
             error = RuntimeError(
                 "⚠️ [EXTRACT] Failed to extract TikTok Ads campaign insights for advertiser_id "
                 f"{advertiser_id} from "
@@ -153,6 +154,7 @@ def extract_campaign_insights(
 
         # Retryable request connection error
         except requests.exceptions.ConnectionError as e:
+            
             error = RuntimeError(
                 "⚠️ [EXTRACT] Failed to extract TikTok Ads campaign insights for advertiser_id "
                 f"{advertiser_id} from "
@@ -163,6 +165,7 @@ def extract_campaign_insights(
             raise error from e
 
         except requests.exceptions.HTTPError as e:
+            
             status = e.response.status_code if e.response else None
 
         # Retryable HTTP error
@@ -190,6 +193,7 @@ def extract_campaign_insights(
 
         # Unknown non-retryable error
         except Exception as e:
+            
             error = RuntimeError(
                 "❌ [EXTRACT] Failed to extract TikTok Ads campaign insights for advertiser_id "
                 f"{advertiser_id} from "
