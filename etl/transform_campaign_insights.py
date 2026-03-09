@@ -10,14 +10,14 @@ def transform_campaign_insights(
 ) -> pd.DataFrame:
     """
     Transform TikTok Ads campaign insights
-    ---------
-    Workflow:
+    ---
+    Principles:
         1. Validate input
         2. Parse actions
         3. Resolve results
         4. Normalize date dimension
         5. Enforce numeric schema
-    ---------
+    ---
     Returns:
         1. DataFrame:
             Enforced campaign insights records
