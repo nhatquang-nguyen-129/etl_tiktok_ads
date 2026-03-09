@@ -199,8 +199,11 @@ def extract_campaign_metadata(
                 code = data.get("code")
                 message = data.get("message")
 
-                # Expired token
-                if code in {40100, 40101}:
+        # Expired token
+                if code in {
+                    40100, 
+                    40101
+                }:
                     error = RuntimeError(
                         "❌ [EXTRACT] Failed to extract TikTok Ads campaign metadata for advertiser_id "
                         f"{advertiser_id} due to expired or invalid access token."
@@ -208,8 +211,12 @@ def extract_campaign_metadata(
                     error.retryable = False
                     raise error
 
-                # Retryable API error
-                if code in {40102, 50000, 50001}:
+        # Retryable API error
+                if code in {
+                    40102,
+                    50000,
+                    50001
+                }:
 
                     campaign_id_has_retryable_error = True
 
@@ -222,7 +229,7 @@ def extract_campaign_metadata(
 
                     continue
 
-                # Non-retryable API error
+        # Non-retryable API error
                 error = RuntimeError(
                     "❌ [EXTRACT] Failed to extract TikTok Ads campaign metadata for campaign_id "
                     f"{campaign_id} due to API error "
@@ -232,12 +239,12 @@ def extract_campaign_metadata(
                 error.retryable = False
                 raise error
 
-            data_block = data.get("data") or {}
-            campaign_list = data_block.get("list", [])
+            block = data.get("data") or {}
+            batch = block.get("list", [])
 
-            if campaign_list:
+            if batch:
 
-                campaign = campaign_list[0]
+                campaign = batch[0]
 
                 rows.append(
                     {
@@ -254,6 +261,7 @@ def extract_campaign_metadata(
 
             status = e.response.status_code if e.response else None
 
+        # Retryable HTTP request error 
             if status and status >= 500:
 
                 campaign_id_has_retryable_error = True
@@ -266,6 +274,7 @@ def extract_campaign_metadata(
 
                 continue
 
+        # Non-retryable HTTP request error
             error = RuntimeError(
                 "❌ [EXTRACT] Failed to extract TikTok Ads campaign metadata for campaign_id "
                 f"{campaign_id} due to HTTP error "
@@ -276,6 +285,7 @@ def extract_campaign_metadata(
 
         except Exception as e:
 
+        # Unknown non-retryable error
             error = RuntimeError(
                 "❌ [EXTRACT] Failed to extract TikTok Ads campaign metadata for campaign_id "
                 f"{campaign_id} due to "
