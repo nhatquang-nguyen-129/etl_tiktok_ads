@@ -14,20 +14,20 @@ def load_campaign_metadata(
 ) -> None:
     """
     Load TikTok Ads campaign metadata
-    ----------------------
-    Workflow:
+    ---
+    Principles:
         1. Validate input DataFrame
         2. Validate output direction for Google BigQuery
         3. Set primary key(s) to advertiser_id and campaign_id
         4. Use UPSERT mode with temporary table for deduplication
         5. Make internalGoogleBigQueryLoader API call
-    ---------
+    ---
     Returns:
         None
     """      
 
     if df.empty:
-        print("⚠️ [LOADER] Empty TikTok Ads campaign metadata Dataframe then loading will be suspended.")
+        print("⚠️ [LOADER] Empty TikTok Ads campaign metadata then loading will be suspended.")
         return
 
     print(
