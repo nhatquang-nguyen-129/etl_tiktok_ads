@@ -133,9 +133,10 @@ def extract_ad_creative(
             )
             error.retryable = False
             raise error from e
-
-        # Unknown non-retryable error  
+        
         except Exception as e:
+        
+        # Unknown non-retryable error
             error = RuntimeError(
                 "❌ [EXTRACT] Failed to extract TikTok Ads ad creative for advertiser_id "
                 f"{advertiser_id} due to "
