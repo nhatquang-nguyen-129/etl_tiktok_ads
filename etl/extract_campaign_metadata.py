@@ -145,9 +145,9 @@ def extract_campaign_metadata(
         error.retryable = False
         raise error from e
 
+        # Unknown non-retryable error
     except Exception as e:
 
-        # Unknown non-retryable error
         error = RuntimeError(
             "❌ [EXTRACT] Failed to extract TikTok Ads advertiser_name for advertiser_id "
             f"{advertiser_id} due to "
@@ -283,9 +283,9 @@ def extract_campaign_metadata(
             error.retryable = False
             raise error from e
 
+        # Unknown non-retryable error        
         except Exception as e:
-
-        # Unknown non-retryable error
+        
             error = RuntimeError(
                 "❌ [EXTRACT] Failed to extract TikTok Ads campaign metadata for campaign_id "
                 f"{campaign_id} due to "
