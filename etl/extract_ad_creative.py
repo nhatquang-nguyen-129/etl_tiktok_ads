@@ -12,14 +12,14 @@ def extract_ad_creative(
 ) -> pd.DataFrame:
     """
     Extract TikTok Ads ad creative
-    ---------
+    ---
     Principles:
         1. No need input ad_ids 
         2. No need to loop each ad_id
         3. Paginate video creative endpoint
         4. Append extracted JSON data to list[dict]
         5. Enforce List[dict] to DataFrame
-    ---------
+    ---
     Returns:
         DataFrame:
             Flattened ad creative records
@@ -144,16 +144,17 @@ def extract_ad_creative(
             error.retryable = False
             raise error from e
 
-        video_list = data.get("data", {}).get("list", [])
+        block = data.get("data") or {}
+        batch = block.get("list", [])
 
-        for record in video_list:
+        for video in batch:
             rows.append(
                 {
                     "advertiser_id": advertiser_id,
-                    "video_id": record.get("video_id"),
-                    "video_cover_url": record.get("video_cover_url"),
-                    "preview_url": record.get("preview_url"),
-                    "create_time": record.get("create_time"),
+                    "video_id": video.get("video_id"),
+                    "video_cover_url": video.get("video_cover_url"),
+                    "preview_url": video.get("preview_url"),
+                    "create_time": video.get("create_time"),
                 }
             )
 
