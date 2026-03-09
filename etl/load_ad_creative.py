@@ -14,14 +14,14 @@ def load_ad_creative(
 ) -> None:
     """
     Load TikTok Ads ad creative
-    ---------
-    Workflow:
+    ---
+    Principles:
         1. No need input ad_ids
         2. Validate output direction for Google BigQuery
         3. Set primary key(s) to advertiser_id and ad_id
         4. Use UPSERT mode with temporary table for deduplication
         5. Make internalGoogleBigQueryLoader API call
-    ---------
+    ---
     Returns:
         None
     """      
