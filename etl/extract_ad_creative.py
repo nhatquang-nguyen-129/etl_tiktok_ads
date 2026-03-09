@@ -160,8 +160,8 @@ def extract_ad_creative(
         page_info = data.get("data", {}).get("page_info", {})
         total_page = page_info.get("total_page", 1)
 
-        pagination_continue = page < total_page
         page += 1
+        pagination_continue = page <= total_page
 
     df = pd.DataFrame(rows)
 
