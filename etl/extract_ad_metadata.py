@@ -176,7 +176,8 @@ def extract_ad_metadata(
 
     print(
         "🔍 [EXTRACT] Extracting TikTok Ads ad metadata for advertiser_id "
-        f"{advertiser_id} with {len(ad_ids)} ad_id(s)..."
+        f"{advertiser_id} with "
+        f"{len(ad_ids)} ad_id(s)..."
     )
 
     for ad_id in ad_ids:
