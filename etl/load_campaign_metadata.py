@@ -27,7 +27,9 @@ def load_campaign_metadata(
     """      
 
     if df.empty:
-        print("⚠️ [LOADER] Empty TikTok Ads campaign metadata then loading will be suspended.")
+        print(
+            "⚠️ [LOADER] Empty TikTok Ads campaign metadata then loading will be suspended."
+        )
         return
 
     print(
