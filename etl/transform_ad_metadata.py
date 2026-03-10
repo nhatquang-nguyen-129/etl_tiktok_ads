@@ -29,7 +29,9 @@ def transform_ad_metadata(
     )
 
     if df.empty:
-        print("⚠️ [TRANSFORM] Empty ad metadata then transformation will be suspended.")
+        print(
+            "⚠️ [TRANSFORM] Empty ad metadata then transformation will be suspended."
+        )
         return df
 
     required_cols = {
