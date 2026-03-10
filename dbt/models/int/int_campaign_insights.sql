@@ -53,13 +53,12 @@ select
     campaign.platform,
     campaign.objective,
     campaign.region,
-    campaign.budget_group_1,
-    campaign.budget_group_2,
+    campaign.budget_group
+    campaign.region
     campaign.category_level_1,
-    campaign.personnel,
-    campaign.track_group,
-    campaign.pillar_group,
-    campaign.content_group
+    campaign.track,
+    campaign.pillar,
+    campaign.`group`
 
 from {{ ref('stg_campaign_insights') }} insights
 left join `{{ target.project }}.{{ var('company') }}_dataset_tiktok_api_raw.{{ var('company') }}_table_tiktok_{{ var('department') }}_{{ var('account') }}_campaign_metadata` campaign
