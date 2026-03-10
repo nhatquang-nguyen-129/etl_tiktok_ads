@@ -91,7 +91,7 @@ def dags_ad_insights(
 
                 if insights.empty:
                     print(
-                        "⚠️ [DAGS] No TikTok Ads ad insights returned from advertiser_id "
+                        "⚠️ [DAGS] No TikTok Ads ad insights extracted from advertiser_id "
                         f"{advertiser_id} then extraction for "
                         f"{dags_split_date} will be suspended."
                     )
@@ -141,31 +141,32 @@ def dags_ad_insights(
                 retryable = getattr(e, "retryable", False)
                 
                 print(
-                    "⚠️ [DAGS] Failed to extract TikTok Ads ad insights with "
+                    "⚠️ [DAGS] Failed to trigger TikTok Ads ad insights extraction with "
                     f"{dags_split_date} for "
-                    f"{attempt}/{DAGS_INSIGHTS_ATTEMPTS} attempts due to "
+                    f"{attempt}/{DAGS_INSIGHTS_ATTEMPTS} attempts due to retryable error "
                     f"{e}."
                 )
 
                 if not retryable:
                     
                     raise RuntimeError(
-                        "❌ [DAGS] Failed to extract TikTok Ads ad insights for "
-                        f"{dags_split_date} due to unexpected error then DAG execution will be aborting."
+                        "❌ [DAGS] Failed to trigger TikTok Ads ad insights extraction for "
+                        f"{dags_split_date} due to non-retryable error then DAG execution will be suspended."
                     ) from e
 
                 if attempt == DAGS_INSIGHTS_ATTEMPTS:
+                    
                     raise RuntimeError(
-                        "❌ [DAGS] Failed to extract TikTok Ads ad insights for "
-                        f"{dags_split_date} in "
-                        f"{attempt}/{DAGS_INSIGHTS_ATTEMPTS} attempts due to exceeded attempt limit then DAG execution will be aborting."
+                        "❌ [DAGS] Failed to trigger TikTok Ads ad insights extraction with "
+                        f"{dags_split_date} for "
+                        f"{attempt}/{DAGS_INSIGHTS_ATTEMPTS} attempts due to exceeded attempt limit then DAG execution will be suspended."
                     ) from e
 
                 wait_to_retry = 60 + (attempt - 1) * 30
                 
                 print(
                     "🔄 [DAGS] Waiting "
-                    f"{wait_to_retry} second(s) before retrying TikTok Ads API "
+                    f"{wait_to_retry} second(s) before retrying TikTok Ads ad insights extraction "
                     f"{attempt}/{DAGS_INSIGHTS_ATTEMPTS} attempts..."
                 )
 
@@ -185,15 +186,18 @@ def dags_ad_insights(
     DAGS_AD_ATTEMPTS = 3
     
     if not total_ad_ids:
+        
         print(
             "⚠️ [DAGS] No TikTok Ads ad_id appended for advertiser_id "
             f"{advertiser_id} from "
             f"{start_date} to "
             f"{end_date} then DAG execution will be suspended."
         )
+        
         return
     
     remaining_ad_ids = set(total_ad_ids)
+    
     dfs_ad_metadata = []
 
     for attempt in range(1, DAGS_AD_ATTEMPTS + 1):
@@ -202,7 +206,7 @@ def dags_ad_insights(
 
             print(
                 "🔄 [DAGS] Trigger to extract TikTok Ads ad metadata for "
-                f"{len(remaining_ad_ids)} ad_id(s) in "
+                f"{len(remaining_ad_ids)} ad_id(s) with "
                 f"{attempt}/{DAGS_AD_ATTEMPTS} attempt(s)..."
             )
 
@@ -215,14 +219,15 @@ def dags_ad_insights(
             if not df_ad_metadata.empty:
                 dfs_ad_metadata.append(df_ad_metadata)
 
-            success_ids = set(df_ad_metadata["ad_id"].dropna().unique())
-            failed_ad_ids = remaining_ad_ids - success_ids
+            success_ad_ids = set(df_ad_metadata["ad_id"].dropna().unique())
+            
+            failed_ad_ids = remaining_ad_ids - success_ad_ids
 
             if not failed_ad_ids:
 
                 print(
                     "✅ [DAGS] Successfully triggered to extract TikTok Ads ad metadata with "
-                    f"{len(success_ids)}/{len(total_ad_ids)} ad_id(s)."
+                    f"{len(success_ad_ids)}/{len(total_ad_ids)} ad_id(s)."
                 )
 
                 break
@@ -230,8 +235,8 @@ def dags_ad_insights(
             remaining_ad_ids = failed_ad_ids
 
             print(
-                "⚠️ [DAGS] "
-                f"{len(failed_ad_ids)} ad_id(s) failed and will be retried."
+                "⚠️ [DAGS] Partially triggered to extract TikTok Ads ad metadata with "
+                f"{len(success_ad_ids)}/{len(total_ad_ids)} ad_id(s)."
             )
 
         except Exception as e:
@@ -245,11 +250,13 @@ def dags_ad_insights(
             )
 
             if not retryable:
+                
                 raise RuntimeError(
                     "❌ [DAGS] Failed to extract TikTok Ads ad metadata due to non-retryable error then DAG execution will be aborting."
                 ) from e
 
             if attempt == DAGS_AD_ATTEMPTS:
+                
                 raise RuntimeError(
                     "❌ [DAGS] Failed to extract TikTok Ads ad metadata due to exceeded attempt limit then DAG execution will be aborting."
                 ) from e
