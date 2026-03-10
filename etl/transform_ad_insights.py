@@ -29,7 +29,9 @@ def transform_ad_insights(
     )
 
     if df.empty:
-        print("⚠️ [TRANSFORM] Empty TikToks Ads ad insights then transformation will be suspended.")
+        print(
+            "⚠️ [TRANSFORM] Empty TikToks Ads ad insights then transformation will be suspended."
+        )
         return df
 
     required_cols = {
