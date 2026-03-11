@@ -27,9 +27,11 @@ def load_campaign_insights(
     """    
 
     if df.empty:
+        
         print(
             "⚠️ [LOADER] Empty TikTok Ads campaign insights then loading will be suspended."
         )
+        
         return
 
     print(
