@@ -53,8 +53,8 @@ select
     campaign.platform,
     campaign.objective,
     campaign.region,
-    campaign.budget_group
-    campaign.region
+    campaign.budget_group,
+    campaign.region,
     campaign.category_level_1,
     campaign.track,
     campaign.pillar,
