@@ -23,6 +23,7 @@ if not all([
     DEPARTMENT,
     ACCOUNT,
 ]):
+    
     raise EnvironmentError(
         "❌ [BACKFILL] Failed to execute TikTok Ads campaign insights backfill due to missing required environment variables."
     )
@@ -52,8 +53,7 @@ def backfill():
         required=True,
         help="Start date in YYYY-MM-DD format"
     )
-    
-    
+
     parser.add_argument(
         "--end_date",
         required=True,
@@ -63,14 +63,19 @@ def backfill():
     args = parser.parse_args()
 
     try:
+        
         start_date = datetime.strptime(args.start_date, "%Y-%m-%d").strftime("%Y-%m-%d")
+        
         end_date = datetime.strptime(args.end_date, "%Y-%m-%d").strftime("%Y-%m-%d")
+    
     except ValueError:
+    
         raise ValueError(
             "❌ [BACKFILL] Failed to execute TikTok Ads campaign insights backfill due to start_date and end_date must be in YYYY-MM-DD format."
         )
 
     if start_date > end_date:
+    
         raise ValueError(
             "❌ [BACKFILL] Failed to execute TikTok Ads campaign insights backfill due to start_date must be less than or equal to end_date."
         )
@@ -87,6 +92,7 @@ def backfill():
 
 # Initialize Google Secret Manager
     try:
+        
         print(
             "🔍 [BACKFILL] Initialize Google Secret Manager client..."
         )
@@ -102,6 +108,7 @@ def backfill():
         )
     
     except Exception as e:
+        
         raise RuntimeError(
             "❌ [BACKFILL] Failed to initialize Google Secret Manager client due to."
             f"{e}."
@@ -109,9 +116,11 @@ def backfill():
         
 # Resolve advertiser_id from Google Secret Manager
     try:
+        
         secret_account_id = (
             f"{COMPANY}_secret_{DEPARTMENT}_tiktok_account_id_{ACCOUNT}"
         )
+        
         secret_account_name = (
             f"projects/{PROJECT}/secrets/{secret_account_id}/versions/latest"
         )
@@ -125,6 +134,7 @@ def backfill():
             name=secret_account_name,
             timeout=10.0,
         )
+        
         advertiser_id = secret_account_response.payload.data.decode("utf-8")
         
         print(
@@ -133,6 +143,7 @@ def backfill():
         )
     
     except Exception as e:
+        
         raise RuntimeError(
             "❌ [BACKFILL] Failed to retrieve TikTok Ads advertiser_id from Google Secret Manager due to "
             f"{e}."
@@ -140,9 +151,11 @@ def backfill():
 
 # Resolve access_token from Google Secret Manager
     try:
+        
         secret_token_id = (
             f"{COMPANY}_secret_all_tiktok_token_access_user"
         )
+        
         secret_token_name = (
             f"projects/{PROJECT}/secrets/{secret_token_id}/versions/latest"
         )
@@ -155,6 +168,7 @@ def backfill():
         secret_token_response = google_secret_client.access_secret_version(
             name=secret_token_name
         )
+        
         access_token = secret_token_response.payload.data.decode("utf-8")
         
         print(
@@ -162,6 +176,7 @@ def backfill():
         )
     
     except Exception as e:
+        
         raise RuntimeError(
         "❌ [BACKFILL] Failed to retrieve TikTok Ads access token from Google Secret Manager due to "
             f"{e}."
@@ -177,7 +192,11 @@ def backfill():
 
 # Entrypoint
 if __name__ == "__main__":
+    
     try:
+    
         backfill()
+    
     except Exception:
+    
         sys.exit(1)
