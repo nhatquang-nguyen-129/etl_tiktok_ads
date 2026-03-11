@@ -13,8 +13,11 @@ from google.api_core.client_options import ClientOptions
 from dags.dags_tiktok_ads import dags_tiktok_ads
 
 COMPANY = os.getenv("COMPANY")
+
 PROJECT = os.getenv("PROJECT")
+
 DEPARTMENT = os.getenv("DEPARTMENT")
+
 ACCOUNT = os.getenv("ACCOUNT")
 
 if not all([
