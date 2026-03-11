@@ -36,7 +36,7 @@ def backfill():
     Backfill TikTok Ads
     ---
     Principles:
-        1. Resolve execution time window form CLI argument --start_date and --end_dat
+        1. Resolve execution time window form CLI argument --start_date and --end_date
         2. Validate OS environment variables
         3. Load secrets from GCP Secret Manager
         4. Resolve advertiser_id and access_token
@@ -148,7 +148,7 @@ def backfill():
     except Exception as e:
         
         raise RuntimeError(
-            "❌ [BACKFILL] Failed to retrieve TikTok Ads account_id from Google Secret Manager due to "
+            "❌ [BACKFILL] Failed to retrieve TikTok Ads advertiser_id from Google Secret Manager due to "
             f"{e}."
         )
 
