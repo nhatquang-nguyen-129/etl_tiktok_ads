@@ -24,14 +24,16 @@ def transform_campaign_metadata(
     """
 
     print(
-        "🔄 [TRANSFORM] Transforming "
-        f"{len(df)} row(s) of TikTok Ads campaign metadata..."
+        "🔄 [TRANSFORM] Transforming TikTok Ads campaign metadata with "
+        f"{len(df)} row(s)..."
     )
 
     if df.empty:
+        
         print(
             "⚠️ [TRANSFORM] Empty campaign metadata then transformation will be suspended."
         )
+        
         return df
 
     required_cols = {
@@ -41,15 +43,20 @@ def transform_campaign_metadata(
         }
     
     missing = required_cols - set(df.columns)
+    
     if missing:
+    
         raise ValueError (
             "❌ [TRANSFORM] Failed to transform TikTok Ads campaign metadata due to missing columns "
             f"{missing} then transformation will be suspended."
         )
 
     df = df.copy()
+    
     df["platform"] = "TikTok"
+    
     df = df.rename(columns={"objective": "result_type"})
+    
     df = df.assign(
         objective=df["campaign_name"].fillna("").str.split("|").str[0].fillna("unknown"),
         budget_group=df["campaign_name"].fillna("").str.split("|").str[1].fillna("unknown"),        
@@ -61,8 +68,8 @@ def transform_campaign_metadata(
     )
 
     print(
-        "✅ [TRANSFORM] Successfully transformed "
-        f"{len(df)} row(s) of TikTok Ads campaign metadata."
+        "✅ [TRANSFORM] Successfully transformed TikTok Ads campaign metadata with "
+        f"{len(df)} row(s)."
     )
 
     return df
