@@ -11,7 +11,7 @@ from dags._dags_ad_insights import dags_ad_insights
 def dags_tiktok_ads(
     *,
     access_token: str,
-    advertiser_id: str,
+    account_id: str,
     start_date: str,
     end_date: str,
     max_workers: int = 2,
@@ -31,8 +31,8 @@ def dags_tiktok_ads(
     """
 
     print(
-        "🔄 [DAGS] Trigger to update TikTok Ads using ThreadPoolExecutor for advertiser_id "
-        f"{advertiser_id} from "
+        "🔄 [DAGS] Trigger to update TikTok Ads using ThreadPoolExecutor for account_id "
+        f"{account_id} from "
         f"{start_date} to "
         f"{end_date} with max_workers "
         f"{max_workers}..."
@@ -43,7 +43,7 @@ def dags_tiktok_ads(
             executor.submit(
                 fn,
                 access_token=access_token,
-                advertiser_id=advertiser_id,
+                account_id=account_id,
                 start_date=start_date,
                 end_date=end_date,
             )
