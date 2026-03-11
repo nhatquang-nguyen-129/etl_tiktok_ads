@@ -84,6 +84,7 @@ def extract_ad_insights(
     while True:
 
         try:
+            
             resp = requests.get(
                 ad_insights_url,
                 headers=headers,
@@ -92,11 +93,13 @@ def extract_ad_insights(
             )
 
             resp.raise_for_status()
+            
             data = resp.json()
 
             if data.get("code") != 0:
 
                 code = data.get("code")
+                
                 message = data.get("message")
 
         # Expired token
@@ -104,11 +107,14 @@ def extract_ad_insights(
                     40100, 
                     40101
                 }:
+                    
                     error = RuntimeError(
                         "❌ [EXTRACT] Failed to extract TikTok Ads ad insights for advertiser_id "
                         f"{advertiser_id} due to expired or invalid access token."
                     )
+                    
                     error.retryable = False
+                    
                     raise error
 
         # Retryable API error
@@ -117,6 +123,7 @@ def extract_ad_insights(
                     50000, 
                     50001
                 }:
+                    
                     error = RuntimeError(
                         "⚠️ [EXTRACT] Failed to extract TikTok Ads ad insights for advertiser_id "
                         f"{advertiser_id} from "
@@ -125,7 +132,9 @@ def extract_ad_insights(
                         f"{message} with error code "
                         f"{code} then this request is eligible to retry."
                     )
+                    
                     error.retryable = True
+                    
                     raise error
 
         # Non-retryable API error
@@ -137,7 +146,9 @@ def extract_ad_insights(
                     f"{message} with error code "
                     f"{code} then this request is not eligible to retry."
                 )
+                
                 error.retryable = False
+                
                 raise error
 
         # Retryable request timeout error
@@ -149,7 +160,9 @@ def extract_ad_insights(
                 f"{start_date} to "
                 f"{end_date} due to request timeout error then this request is eligible to retry."
             )
+            
             error.retryable = True
+            
             raise error from e
 
         # Retryable request connection error
@@ -161,7 +174,9 @@ def extract_ad_insights(
                 f"{start_date} to "
                 f"{end_date} due to request connection error then this request is eligible to retry."
             )
+            
             error.retryable = True
+            
             raise error from e
 
         except requests.exceptions.HTTPError as e:
@@ -170,6 +185,7 @@ def extract_ad_insights(
 
         # Retryable HTTP request error   
             if status and status >= 500:
+                
                 error = RuntimeError(
                     "⚠️ [EXTRACT] Failed to extract TikTok Ads ad insights for advertiser_id "
                     f"{advertiser_id} from "
@@ -177,7 +193,9 @@ def extract_ad_insights(
                     f"{end_date} due to HTTP error "
                     f"{status} then this request is eligible to retry."
                 )
+                
                 error.retryable = True
+                
                 raise error from e
 
         # Non-retryable HTTP request error
@@ -188,7 +206,9 @@ def extract_ad_insights(
                 f"{end_date} due to HTTP error "
                 f"{status} then this request is not eligible to retry."
             )
+            
             error.retryable = False
+            
             raise error from e
 
         # Unknown non-retryable error 
@@ -201,15 +221,19 @@ def extract_ad_insights(
                 f"{end_date} due to "
                 f"{e}."
             )
+            
             error.retryable = False
+            
             raise error from e
 
         block = data.get("data") or {}
+        
         batch = block.get("list", [])
 
         records.extend(batch)
 
         if len(batch) < payload["page_size"]:
+
             break
 
         payload["page"] += 1
@@ -221,6 +245,7 @@ def extract_ad_insights(
         row = {}
 
         row.update(record.get("dimensions", {}))
+        
         row.update(record.get("metrics", {}))
 
         row["advertiser_id"] = advertiser_id
