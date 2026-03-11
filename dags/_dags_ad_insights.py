@@ -23,8 +23,11 @@ from etl.load_campaign_metadata import load_campaign_metadata
 from dbt.run import dbt_tiktok_ads
 
 COMPANY = os.getenv("COMPANY")
+
 PROJECT = os.getenv("PROJECT")
+
 DEPARTMENT = os.getenv("DEPARTMENT")
+
 ACCOUNT = os.getenv("ACCOUNT")
 
 def dags_ad_insights(
