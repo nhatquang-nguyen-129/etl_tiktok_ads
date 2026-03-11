@@ -70,11 +70,13 @@ def extract_ad_metadata(
         )
 
         resp.raise_for_status()
+
         data = resp.json()
 
         if data.get("code") != 0:
 
             code = data.get("code")
+
             message = data.get("message")
 
         # Expired token
@@ -82,11 +84,14 @@ def extract_ad_metadata(
                 40100, 
                 40101
             }:
+
                 error = RuntimeError(
                     "❌ [EXTRACT] Failed to extract TikTok Ads advertiser_name for advertiser_id "
                     f"{advertiser_id} due to expired or invalid access token."
                 )
+
                 error.retryable = False
+
                 raise error
 
         # Retryable API error
@@ -95,13 +100,16 @@ def extract_ad_metadata(
                 50000, 
                 50001
             }:
+
                 error = RuntimeError(
                     "⚠️ [EXTRACT] Failed to extract TikTok Ads advertiser_name for advertiser_id " 
                     f"{advertiser_id} due to API error "
                     f"{message} with error code "
                     f"{code} then this request is eligible to retry."
                 )
+
                 error.retryable = True
+
                 raise error
         
         # Non-retryable API error
@@ -111,7 +119,9 @@ def extract_ad_metadata(
                 f"{message} with error code "
                 f"{code} then this request is not eligible to retry."
             )
+
             error.retryable = False
+
             raise error
 
         advertiser_name = data["data"]["list"][0].get("name")
@@ -134,7 +144,9 @@ def extract_ad_metadata(
                 f"{advertiser_id} due to HTTP error "
                 f"{status} then this request is eligible to retry."
             )
+
             error.retryable = True
+
             raise error from e
 
         # Non-retryable HTTP request error
@@ -143,7 +155,9 @@ def extract_ad_metadata(
             f"{advertiser_id} due to HTTP error "
             f"{status} then this request is not eligible to retry."
         )
+
         error.retryable = False
+
         raise error from e
 
         # Unknown non-retryable error   
@@ -154,7 +168,9 @@ def extract_ad_metadata(
             f"{advertiser_id} due to "
             f"{e}."
         )
+
         error.retryable = False
+
         raise error from e
 
     # Make TikTok Ads API call for ad metadata
@@ -198,11 +214,13 @@ def extract_ad_metadata(
             )
 
             resp.raise_for_status()
+
             data = resp.json()
 
             if data.get("code") != 0:
 
                 code = data.get("code")
+
                 message = data.get("message")
 
         # Expired token
@@ -210,11 +228,14 @@ def extract_ad_metadata(
                     40100, 
                     40101
                 }:
+
                     error = RuntimeError(
                         "❌ [EXTRACT] Failed to extract TikTok Ads ad metadata for advertiser_id "
                         f"{advertiser_id} due to expired or invalid access token."
                     )
+
                     error.retryable = False
+
                     raise error
 
         # Retryable API error
@@ -242,10 +263,13 @@ def extract_ad_metadata(
                     f"{message} with error code "
                     f"{code} then this request is not eligible to retry."
                 )
+                
                 error.retryable = False
+                
                 raise error
-
+            
             block = data.get("data") or {}
+            
             batch = block.get("list", [])
 
             if batch:
@@ -293,7 +317,9 @@ def extract_ad_metadata(
                 f"{ad_id} due to HTTP error "
                 f"{status} then this request is not eligible to retry."
             )
+
             error.retryable = False
+
             raise error from e
 
         # Unknown non-retryable error
@@ -304,7 +330,9 @@ def extract_ad_metadata(
                 f"{ad_id} due to "
                 f"{e}."
             )
+
             error.retryable = False
+
             raise error from e
 
     df = pd.DataFrame(rows)
