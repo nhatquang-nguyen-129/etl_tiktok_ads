@@ -255,8 +255,8 @@ def extract_ad_insights(
     df = pd.DataFrame(rows)
 
     print(
-        "✅ [EXTRACT] Successfully extracted "
-        f"{len(df)} row(s) of TikTok Ads ad insights for advertiser_id "
+        "✅ [EXTRACT] Successfully extracted TikTok Ads ad insights with "
+        f"{len(df)} row(s) for advertiser_id "
         f"{advertiser_id} from "
         f"{start_date} to "
         f"{end_date}."
