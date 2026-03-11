@@ -29,9 +29,11 @@ def transform_ad_metadata(
     )
 
     if df.empty:
+        
         print(
             "⚠️ [TRANSFORM] Empty ad metadata then transformation will be suspended."
         )
+        
         return df
 
     required_cols = {
@@ -43,13 +45,16 @@ def transform_ad_metadata(
         }
     
     missing = required_cols - set(df.columns)
+    
     if missing:
+    
         raise ValueError (
             "❌ [TRANSFORM] Failed to transform TikTok Ads ad metadata due to missing columns "
             f"{missing} then transformation will be suspended."
         )
 
     df = df.copy()
+    
     df = df.assign(
         location=lambda df: df["adgroup_name"].fillna("").str.split("|").str[0].fillna("unknown"),
         gender=lambda df: df["adgroup_name"].fillna("").str.split("|").str[1].fillna("unknown"),
