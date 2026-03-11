@@ -35,8 +35,8 @@ def load_campaign_insights(
         return
 
     print(
-        "🔄 [LOADER] Triggering to load "
-        f"{len(df)} row(s) of TikTok Ads campaign insights to Google BigQuery table "
+        "🔄 [LOADER] Triggering to load TikTok Ads campaign insights with "
+        f"{len(df)} row(s) to Google BigQuery table "
         f"{direction}..."
         )
 
