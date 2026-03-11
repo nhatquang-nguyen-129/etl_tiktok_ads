@@ -90,11 +90,13 @@ def dags_ad_insights(
                 )
 
                 if insights.empty:
+                    
                     print(
                         "⚠️ [DAGS] No TikTok Ads ad insights extracted from advertiser_id "
-                        f"{advertiser_id} then extraction for "
+                        f"{advertiser_id} then DAG execution for "
                         f"{dags_split_date} will be suspended."
                     )
+                    
                     break
 
     # Transform
@@ -203,6 +205,7 @@ def dags_ad_insights(
 
     for attempt in range(1, DAGS_AD_ATTEMPTS + 1):
 
+    # Extract
         try:
 
             print(
@@ -413,6 +416,7 @@ def dags_ad_insights(
 
     for attempt in range(1, DAGS_CAMPAIGN_ATTEMPTS + 1):
 
+    # Extract
         try:
 
             print(
@@ -431,9 +435,7 @@ def dags_ad_insights(
                 
                 dfs_campaign_metadata.append(df_campaign_metadata)
 
-            success_campaign_ids = set(
-                df_campaign_metadata["campaign_id"].dropna().unique()
-            )
+            success_campaign_ids = set(df_campaign_metadata["campaign_id"].dropna().unique())
 
             failed_campaign_ids = remaining_campaign_ids - success_campaign_ids
 
