@@ -307,22 +307,22 @@ def extract_ad_metadata(
             error.retryable = False
             raise error from e
 
-    if ad_id_has_retryable_error:
-
-        error = RuntimeError(
-            "⚠️ [EXTRACT] Failed to extract TikTok Ads ad metadata for "
-            f"{len(ad_ids)} ad_id(s) from advertiser_id "
-            f"{advertiser_id} due to retryable error(s) then this request is eligible to retry."
-        )
-        error.retryable = True
-        raise error
-
     df = pd.DataFrame(rows)
 
-    print(
-        "✅ [EXTRACT] Successfully extracted "
-        f"{len(df)}/{len(ad_ids)} row(s) of TikTok Ads ad metadata for advertiser_id "
-        f"{advertiser_id}."
-    )
+    if ad_id_has_retryable_error:
+
+        print(
+            "⚠️ [EXTRACT] Partially extracted TikTok Ads ad metadata with "
+            f"{len(df)}/{len(ad_ids)} row(s) for advertiser_id "
+            f"{advertiser_id}."
+        )
+
+    else:
+
+        print(
+            "✅ [EXTRACT] Successfully extracted TikTok Ads ad metadata with "
+            f"{len(df)}/{len(ad_ids)} row(s) for advertiser_id "
+            f"{advertiser_id}."
+        )
 
     return df
