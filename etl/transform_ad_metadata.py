@@ -24,8 +24,8 @@ def transform_ad_metadata(
     """
 
     print(
-        "🔄 [TRANSFORM] Transforming "
-        f"{len(df)} row(s) of TikTok Ads ad metadata..."
+        "🔄 [TRANSFORM] Transforming TikTok Ads ad metadata with "
+        f"{len(df)} row(s)..."
     )
 
     if df.empty:
@@ -68,8 +68,8 @@ def transform_ad_metadata(
     )  
 
     print(
-        "✅ [TRANSFORM] Successfully transformed "
-        f"{len(df)} row(s) of TikTok Ads ad metadata."
+        "✅ [TRANSFORM] Successfully transformed TikTok Ads ad metadata "
+        f"{len(df)} row(s)."
     )
 
     return df
