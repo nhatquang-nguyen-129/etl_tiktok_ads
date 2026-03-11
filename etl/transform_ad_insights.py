@@ -24,8 +24,8 @@ def transform_ad_insights(
     """
 
     print(
-        "🔄 [TRANSFORM] Transforming "
-        f"{len(df)} row(s) of TikTok Ads ad insights..."
+        "🔄 [TRANSFORM] Transforming TikTok Ads ad insights with "
+        f"{len(df)} row(s)..."
     )
 
     if df.empty:
@@ -86,8 +86,8 @@ def transform_ad_insights(
     )
 
     print(
-        "✅ [TRANSFORM] Successfully transformed "
-        f"{len(df)} row(s) of TikTok Ads ad insights."
+        "✅ [TRANSFORM] Successfully transformed TikTok Ads ad insights "
+        f"{len(df)} row(s)."
     )
 
     return df
