@@ -297,7 +297,7 @@ def dags_campaign_insights(
 
     print(
         "🔄 [DAGS] Trigger to load TikTok Ads campaign metadata for "
-        f"{len(df_campaign_metadatas)} row(s) to"
+        f"{len(df_campaign_metadatas)} row(s) to "
         f"{_campaign_metadata_direction}..."       
     )
 
