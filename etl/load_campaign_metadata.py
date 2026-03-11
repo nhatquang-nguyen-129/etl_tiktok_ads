@@ -35,8 +35,8 @@ def load_campaign_metadata(
         return
 
     print(
-        "🔄 [LOADER] Triggering to load "
-        f"{len(df)} row(s) of TikTok Ads campaign metadata to Google BigQuery table "
+        "🔄 [LOADER] Triggering to load TikTok Ads campaign metadata with "
+        f"{len(df)} row(s) to Google BigQuery table "
         f"{direction}..."
         )
     
