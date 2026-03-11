@@ -39,6 +39,7 @@ def dags_tiktok_ads(
     )
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        
         futures = [
             executor.submit(
                 fn,
@@ -54,4 +55,5 @@ def dags_tiktok_ads(
         ]
         
         for future in futures:
+        
             future.result()
