@@ -41,7 +41,9 @@ def extract_ad_creative(
     rows: list[dict] = []
 
     page = 1
+
     page_size = 100
+
     pagination_continue = True
 
     # Make TikTok Ads API call for ad creative
@@ -68,11 +70,13 @@ def extract_ad_creative(
             )
 
             resp.raise_for_status()
+            
             data = resp.json()
 
             if data.get("code") != 0:
 
                 code = data.get("code")
+            
                 message = data.get("message")
 
         # Expired token
@@ -80,11 +84,14 @@ def extract_ad_creative(
                     40100, 
                     40101
                 }:
+                  
                     error = RuntimeError(
                         "❌ [EXTRACT] Failed to extract TikTok Ads ad creative for advertiser_id "
                         f"{advertiser_id} due to expired or invalid access token."
                     )
+                   
                     error.retryable = False
+                   
                     raise error
 
         # Retryable API error
@@ -93,13 +100,16 @@ def extract_ad_creative(
                     50000,
                     50001
                 }:
+                    
                     error = RuntimeError(
                         "⚠️ [EXTRACT] Failed to extract TikTok Ads ad creative for advertiser_id "
                         f"{advertiser_id} due to API error "
                         f"{message} with error code "
                         f"{code} then this request is eligible to retry."
                     )
+                    
                     error.retryable = True
+                    
                     raise error
 
         # Non-retryable API error
@@ -109,20 +119,26 @@ def extract_ad_creative(
                     f"{message} with error code "
                     f"{code} then this request is not eligible to retry."
                 )
+                
                 error.retryable = False
+                
                 raise error
 
         except requests.HTTPError as e:
+            
             status = e.response.status_code if e.response else None
 
         # Retryable HTTP request error 
             if status and status >= 500:
+                
                 error = RuntimeError(
                     "⚠️ [EXTRACT] Failed to extract TikTok Ads ad creative for advertiser_id "
                     f"{advertiser_id} due to HTTP error "
                     f"{status} then this request is eligible to retry."
                 )
+                
                 error.retryable = True
+                
                 raise error from e
 
         # Non-retryable HTTP request error
@@ -131,7 +147,9 @@ def extract_ad_creative(
                 f"{advertiser_id} due to HTTP error "
                 f"{status} then this request is not eligible to retry."
             )
+            
             error.retryable = False
+            
             raise error from e
         
         # Unknown non-retryable error          
@@ -142,13 +160,17 @@ def extract_ad_creative(
                 f"{advertiser_id} due to "
                 f"{e}."
             )
+
             error.retryable = False
+
             raise error from e
 
         block = data.get("data") or {}
+
         batch = block.get("list", [])
 
         for record in batch:
+
             rows.append(
                 {
                     "advertiser_id": advertiser_id,
@@ -160,9 +182,11 @@ def extract_ad_creative(
             )
 
         page_info = data.get("data", {}).get("page_info", {})
+
         total_page = page_info.get("total_page", 1)
 
         page += 1
+
         pagination_continue = page <= total_page
 
     df = pd.DataFrame(rows)
