@@ -30,39 +30,52 @@ def dbt_tiktok_ads(
         "build",
         "--profiles-dir", ".",
         "--select", select,
+        "--no-write-json"
     ]
 
     print(
-        "🔄 [DBT] Executing dbt build for TikTok Ads "
-        f"{select} insights to Google Cloud Project "
+        f"🔄 [DBT] Executing dbt build for TikTok Ads "
+        f"{select} to Google Cloud Project "
         f"{google_cloud_project}..."
     )
 
     try:
-        result = subprocess.run(
+
+        process = subprocess.Popen(
             cmd,
             cwd="dbt",
             env=os.environ,
-            check=True,
-            capture_output=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
             text=True,
+            bufsize=1
         )
 
-        print(result.stdout)
+        for line in process.stdout:
 
-        if result.stderr:
-            print(result.stderr)
+            print(line, end="")
+
+        process.wait()
+
+        if process.returncode != 0:
+
+            raise RuntimeError(
+                "❌ [DBT] Failed to execute dbt build for TikTok Ads "
+                f"{select} to Google Cloud Project "
+                f"{google_cloud_project} with return code "
+                f"{process.returncode}."
+            )
 
         print(
-            "✅ [DBT] Successfully executed dbt build for TikTok Ads "
-            f"{select} insights to Google Cloud Project "
+            f"✅ [DBT] Successfully executed dbt build for TikTok Ads "
+            f"{select} to Google Cloud Project "
             f"{google_cloud_project}."
         )
 
-    except subprocess.CalledProcessError as e:
+    except Exception as e:
+        
         raise RuntimeError(
-            "❌ [DBT] Failed to execute dbt build for TikTok Ads "
-            f"{select} insights to Google Cloud Project "
-            f"{google_cloud_project} due to "
-            f"{e}."
+            "❌ [DBT] Unexpected error while executing dbt build for TikTok Ads "
+            f"{select} to Google Cloud Project "
+            f"{google_cloud_project}: {e}"
         ) from e
