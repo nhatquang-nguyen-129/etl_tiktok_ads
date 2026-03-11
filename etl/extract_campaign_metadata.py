@@ -70,11 +70,13 @@ def extract_campaign_metadata(
         )
 
         resp.raise_for_status()
+        
         data = resp.json()
 
         if data.get("code") != 0:
 
             code = data.get("code")
+        
             message = data.get("message")
 
         # Expired token
@@ -82,11 +84,14 @@ def extract_campaign_metadata(
                 40100, 
                 40101
             }:
+        
                 error = RuntimeError(
                     "❌ [EXTRACT] Failed to extract TikTok Ads advertiser_name for advertiser_id "
                     f"{advertiser_id} due to expired or invalid access token."
                 )
+        
                 error.retryable = False
+        
                 raise error
 
         # Retryable API error
@@ -95,13 +100,16 @@ def extract_campaign_metadata(
                 50000, 
                 50001
             }:
+        
                 error = RuntimeError(
                     "⚠️ [EXTRACT] Failed to extract TikTok Ads advertiser_name for advertiser_id "
                     f"{advertiser_id} due to API error "
                     f"{message} with error code "
                     f"{code} then this request is eligible to retry."
                 )
+        
                 error.retryable = True
+        
                 raise error
 
         # Non-retryable API error
@@ -111,7 +119,9 @@ def extract_campaign_metadata(
                 f"{message} with error code "
                 f"{code} then this request is not eligible to retry."
             )
+        
             error.retryable = False
+        
             raise error
 
         advertiser_name = data["data"]["list"][0].get("name")
@@ -128,12 +138,15 @@ def extract_campaign_metadata(
 
         # Retryable HTTP request error
         if status and status >= 500:
+        
             error = RuntimeError(
                 "⚠️ [EXTRACT] Failed to extract TikTok Ads advertiser_name for advertiser_id "
                 f"{advertiser_id} due to HTTP error "
                 f"{status} then this request is eligible to retry."
             )
+        
             error.retryable = True
+        
             raise error from e
 
         # Non-retryable HTTP request error
@@ -142,7 +155,9 @@ def extract_campaign_metadata(
             f"{advertiser_id} due to HTTP error "
             f"{status} then this request is not eligible to retry."
         )
+        
         error.retryable = False
+        
         raise error from e
 
         # Unknown non-retryable error
@@ -153,7 +168,9 @@ def extract_campaign_metadata(
             f"{advertiser_id} due to "
             f"{e}."
         )
+        
         error.retryable = False
+        
         raise error from e
 
     # Make TikTok Ads API call for campaign metadata
@@ -192,11 +209,13 @@ def extract_campaign_metadata(
             )
 
             resp.raise_for_status()
+
             data = resp.json()
 
             if data.get("code") != 0:
 
                 code = data.get("code")
+
                 message = data.get("message")
 
         # Expired token
@@ -204,11 +223,14 @@ def extract_campaign_metadata(
                     40100, 
                     40101
                 }:
+
                     error = RuntimeError(
                         "❌ [EXTRACT] Failed to extract TikTok Ads campaign metadata for advertiser_id "
                         f"{advertiser_id} due to expired or invalid access token."
                     )
+
                     error.retryable = False
+
                     raise error
 
         # Retryable API error
@@ -236,10 +258,13 @@ def extract_campaign_metadata(
                     f"{message} with error code "
                     f"{code} then this request is not eligible to retry."
                 )
+                
                 error.retryable = False
+                
                 raise error
 
             block = data.get("data") or {}
+            
             batch = block.get("list", [])
 
             if batch:
@@ -280,7 +305,9 @@ def extract_campaign_metadata(
                 f"{campaign_id} due to HTTP error "
                 f"{status} then this request is not eligible to retry."
             )
+            
             error.retryable = False
+            
             raise error from e
 
         # Unknown non-retryable error        
@@ -291,25 +318,27 @@ def extract_campaign_metadata(
                 f"{campaign_id} due to "
                 f"{e}."
             )
+            
             error.retryable = False
+            
             raise error from e
-
-    if campaign_id_has_retryable_error:
-
-        error = RuntimeError(
-            "⚠️ [EXTRACT] Failed to extract TikTok Ads campaign metadata for "
-            f"{len(campaign_ids)} campaign_id(s) from advertiser_id "
-            f"{advertiser_id} due to retryable error(s) then this request is eligible to retry."
-        )
-        error.retryable = True
-        raise error
 
     df = pd.DataFrame(rows)
 
-    print(
-        "✅ [EXTRACT] Successfully extracted "
-        f"{len(df)}/{len(campaign_ids)} row(s) of TikTok Ads campaign metadata for advertiser_id "
-        f"{advertiser_id}."
-    )
+    if campaign_id_has_retryable_error:
+
+        print(
+            "⚠️ [EXTRACT] Partially extracted TikTok Ads campaign metadata with "
+            f"{len(df)}/{len(campaign_ids)} row(s) for advertiser_id "
+            f"{advertiser_id}."
+        )
+
+    else:
+
+        print(
+            "✅ [EXTRACT] Successfully extracted TikTok Ads campaign metadata with "
+            f"{len(df)}/{len(campaign_ids)} row(s) for advertiser_id "
+            f"{advertiser_id}."
+        )
 
     return df
