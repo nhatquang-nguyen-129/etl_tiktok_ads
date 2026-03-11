@@ -3,45 +3,42 @@ from pathlib import Path
 ROOT_FOLDER_LOCATION = Path(__file__).resolve().parents[2]
 sys.path.append(str(ROOT_FOLDER_LOCATION))
 
-import time
 import requests
 import pandas as pd
 
 def extract_campaign_insights(
-    advertiser_id: str,
     access_token: str,
+    advertiser_id: str,
     start_date: str,
     end_date: str,
 ) -> pd.DataFrame:
     """
     Extract TikTok Ads campaign insights
-    ---------
-    Workflow:
+    ---
+    Principles:
         1. Validate input advertiser_id
         2. Validate input start_date and end_date
         3. Make API call for report/integrated/get endpoint
         4. Append extracted JSON data to list[dict]
         5. Enforce List[dict] to DataFrame
-    ---------
+    ---
     Returns:
-        1. DataFrame:
+        DataFrame:
             Flattened campaign insights records
     """
 
-    start_time = time.time()
-
+    # Validate input
     headers = {
         "Access-Token": access_token,
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
     }
 
-    timeout =(
+    timeout = (
         30,
-        600
+        600,
     )
-    
-    # Make TikTok Ads API v1.3 call for campaign insights
-    campaign_insights_url = "https://business-api.tiktok.com/open_api/v1.3/report/integrated/get/"   
+
+    campaign_insights_url = "https://business-api.tiktok.com/open_api/v1.3/report/integrated/get/"
 
     dimensions = [
         "campaign_id",
@@ -71,54 +68,63 @@ def extract_campaign_insights(
         "start_date": start_date,
         "end_date": end_date,
         "page_size": 1000,
-        "page": 1
+        "page": 1,
     }
 
     records = []
 
-    try:
-        print(
-            "🔍 [EXTRACT] Extracting TikTok Ads campaign insights for advertiser_id "
-            f"{advertiser_id} from "
-            f"{start_date} to "
-            f"{end_date}..."
-        )        
+    # Make TikTok Ads API call for campaign insights
+    print(
+        "🔍 [EXTRACT] Extracting TikTok Ads campaign insights for advertiser_id "
+        f"{advertiser_id} from "
+        f"{start_date} to "
+        f"{end_date}..."
+    )
 
-        while True:
+    while True:
+
+        try:
+            
             resp = requests.get(
                 campaign_insights_url,
                 headers=headers,
                 json=payload,
                 timeout=timeout,
             )
+
             resp.raise_for_status()
+            
             data = resp.json()
 
             if data.get("code") != 0:
+
                 code = data.get("code")
+            
                 message = data.get("message")
 
-        # Expired token error
+        # Expired token
                 if code in {
-                    40100, 
-                    40101
+                    40100,
+                    40101,
                 }:
-                    retryable = False
-                    raise RuntimeError(
+                    
+                    error = RuntimeError(
                         "❌ [EXTRACT] Failed to extract TikTok Ads campaign insights for advertiser_id "
-                        f"{advertiser_id} from "
-                        f"{start_date} to "
-                        f"{end_date} due to expired or invalid access token then manual token refresh is required."
+                        f"{advertiser_id} due to expired or invalid access token."
                     )
+                    
+                    error.retryable = False
+                    
+                    raise error
 
-        # Unexpected retryable API error
+        # Retryable API error
                 if code in {
-                    40102, 
-                    50000, 
-                    50001
+                    40102,
+                    50000,
+                    50001,
                 }:
-                    retryable = True
-                    raise RuntimeError(
+                    
+                    error = RuntimeError(
                         "⚠️ [EXTRACT] Failed to extract TikTok Ads campaign insights for advertiser_id "
                         f"{advertiser_id} from "
                         f"{start_date} to "
@@ -126,10 +132,13 @@ def extract_campaign_insights(
                         f"{message} with error code "
                         f"{code} then this request is eligible to retry."
                     )
+                    
+                    error.retryable = True
+                    
+                    raise error
 
-        # Unexpected non-retryable API error
-                retryable = False
-                raise RuntimeError(
+        # Non-retryable API error
+                error = RuntimeError(
                     "❌ [EXTRACT] Failed to extract TikTok Ads campaign insights for advertiser_id "
                     f"{advertiser_id} from "
                     f"{start_date} to "
@@ -137,93 +146,120 @@ def extract_campaign_insights(
                     f"{message} with error code "
                     f"{code} then this request is not eligible to retry."
                 )
+                
+                error.retryable = False
+                
+                raise error
 
-            batch = data.get("data", {}).get("list", [])
-            records.extend(batch)
-
-            if len(batch) < payload["page_size"]:
-                break
-
-            payload["page"] += 1
-
-        rows = []
-        for record in records:
-            row = {}
-            row.update(record.get("dimensions", {}))
-            row.update(record.get("metrics", {}))
-            row["advertiser_id"] = advertiser_id
-            rows.append(row)
-
-        df = pd.DataFrame(rows)
-        df.attrs["retryable"] = False
-        df.attrs["time_elapsed"] = round(time.time() - start_time, 2)
-        df.attrs["rows_input"] = None
-        df.attrs["rows_output"] = len(df)
-
-        print(
-            "✅ [EXTRACT] Successfully extracted TikTok Ads campaign insights for advertiser_id "
-            f"{advertiser_id} from "
-            f"{start_date} to "
-            f"{end_date} with "
-            f"{len(df)} row(s) in "
-            f"{df.attrs['time_elapsed']}s."
-        )
-
-        return df
-
-        # Unexpected retryable request timeout error
-    except requests.exceptions.Timeout as e:      
-        retryable = True
-        raise RuntimeError(
-            "⚠️ [EXTRACT] Failed to extract TikTok Ads campaign insights for advertiser_id "
-            f"{advertiser_id} from "
-            f"{start_date} to "
-            f"{end_date} due to request timeout error then this request is eligible to retry."
-        ) from e
-
-        # Unexpected retryable request connection timeout error
-    except requests.exceptions.ConnectionError as e:
-        retryable = True
-        raise RuntimeError(
-            "⚠️ [EXTRACT] Failed to extract TikTok Ads campaign insights for advertiser_id "
-            f"{advertiser_id} from "
-            f"{start_date} to "
-            f"{end_date} due to request connection error then this request is eligible to retry."
-        ) from e
-
-    except requests.exceptions.HTTPError as e:
-        status = e.response.status_code if e.response else None
-        
-        # Unexpected retryable HTTP request error   
-        if status and status >= 500:
-            retryable = True
-            raise RuntimeError(
+        # Retryable request timeout error
+        except requests.exceptions.Timeout as e:
+            
+            error = RuntimeError(
                 "⚠️ [EXTRACT] Failed to extract TikTok Ads campaign insights for advertiser_id "
                 f"{advertiser_id} from "
                 f"{start_date} to "
+                f"{end_date} due to request timeout error then this request is eligible to retry."
+            )
+            
+            error.retryable = True
+            
+            raise error from e
+
+        # Retryable request connection error
+        except requests.exceptions.ConnectionError as e:
+            
+            error = RuntimeError(
+                "⚠️ [EXTRACT] Failed to extract TikTok Ads campaign insights for advertiser_id "
+                f"{advertiser_id} from "
+                f"{start_date} to "
+                f"{end_date} due to request connection error then this request is eligible to retry."
+            )
+            
+            error.retryable = True
+            
+            raise error from e
+
+        except requests.exceptions.HTTPError as e:
+            
+            status = e.response.status_code if e.response else None
+
+        # Retryable HTTP error
+            if status and status >= 500:
+            
+                error = RuntimeError(
+                    "⚠️ [EXTRACT] Failed to extract TikTok Ads campaign insights for advertiser_id "
+                    f"{advertiser_id} from "
+                    f"{start_date} to "
+                    f"{end_date} due to HTTP error "
+                    f"{status} then this request is eligible to retry."
+                )
+            
+                error.retryable = True
+            
+                raise error from e
+
+        # Non-retryable HTTP error
+            error = RuntimeError(
+                "❌ [EXTRACT] Failed to extract TikTok Ads campaign insights for advertiser_id "
+                f"{advertiser_id} from "
+                f"{start_date} to "
+                f"{end_date} due to HTTP error "
+                f"{status} then this request is not eligible to retry."
+            )
+            
+            error.retryable = False
+            
+            raise error from e
+
+        # Unknown non-retryable error
+        except Exception as e:
+            
+            error = RuntimeError(
+                "❌ [EXTRACT] Failed to extract TikTok Ads campaign insights for advertiser_id "
+                f"{advertiser_id} from "
+                f"{start_date} to "
                 f"{end_date} due to "
-                f"{e} with HTTP request status "
-                f"{status} then this request is eligible to retry."
-            ) from e
+                f"{e}."
+            )
+            
+            error.retryable = False
+            
+            raise error from e
 
-        # Unexpected non-retryable HTTP request error
-        retryable = False
-        raise RuntimeError(
-            "❌ [EXTRACT] Failed to extract TikTok Ads campaign insights for advertiser_id "
-            f"{advertiser_id} from "
-            f"{start_date} to "
-            f"{end_date} due to "
-            f"{e} with HTTP request status "
-            f"{status} then this request is not eligible to retry."
-        ) from e
+        block = data.get("data") or {}
+        
+        batch = block.get("list", [])
 
-        # Unknown non-retryable error 
-    except Exception as e:
-        retryable = False
-        raise RuntimeError(
-            "❌ [EXTRACT] Failed to extract TikTok Ads campaign insights for advertiser_id "
-            f"{advertiser_id} from "
-            f"{start_date} to "
-            f"{end_date} due to "
-            f"{e}."
-        ) from e
+        records.extend(batch)
+
+        if len(batch) < payload["page_size"]:
+        
+            break
+
+        payload["page"] += 1
+
+    rows = []
+
+    for record in records:
+
+        row = {}
+
+        row.update(record.get("dimensions", {}))
+        
+        row.update(record.get("metrics", {}))
+
+        row["advertiser_id"] = advertiser_id
+
+        rows.append(row)
+
+    df = pd.DataFrame(rows)
+
+    print(
+        "✅ [EXTRACT] Successfully extracted TikTok Ads campaign insights with "
+        f"{len(df)} row(s) for advertiser_id "
+        f"{advertiser_id} from "
+        f"{start_date} to "
+        f"{end_date}."
+    )
+
+    return df

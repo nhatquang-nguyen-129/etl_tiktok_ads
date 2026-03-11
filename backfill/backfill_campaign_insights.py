@@ -1,11 +1,11 @@
-from pathlib import Path
+import os
 import sys
+from pathlib import Path
 ROOT_FOLDER_LOCATION = Path(__file__).resolve().parents[1]
 sys.path.append(str(ROOT_FOLDER_LOCATION))
 
 import argparse
 from datetime import datetime
-import os
 
 from google.cloud import secretmanager
 from google.api_core.client_options import ClientOptions
@@ -13,8 +13,11 @@ from google.api_core.client_options import ClientOptions
 from dags.dags_tiktok_ads import dags_campaign_insights
 
 COMPANY = os.getenv("COMPANY")
+
 PROJECT = os.getenv("PROJECT")
+
 DEPARTMENT = os.getenv("DEPARTMENT")
+
 ACCOUNT = os.getenv("ACCOUNT")
 
 if not all([
@@ -23,47 +26,65 @@ if not all([
     DEPARTMENT,
     ACCOUNT,
 ]):
-    raise EnvironmentError("❌ [BACKFILL] Failed to execute TikTok Ads campaign insights update due to missing required environment variables.")
+    
+    raise EnvironmentError(
+        "❌ [BACKFILL] Failed to execute TikTok Ads campaign insights backfill due to missing required environment variables."
+    )
 
 def backfill():
     """
     Backfill TikTok Ads campaign insights
-    ---------
-    Workflow:
-        1. Resolve execution time window from MODE
-        2. Read & validate OS environment variables
+    ---
+    Principles:
+        1. Resolve execution time window form CLI argument --start_date and --end_date
+        2. Validate OS environment variables
         3. Load secrets from GCP Secret Manager
         4. Resolve advertiser_id and access_token
         5. Dispatch execution to DAG orchestrator
-    Return:
+    ---
+    Returns:
         None
     """
 
 # CLI arguments parser for manual date range
-    parser = argparse.ArgumentParser(description="Manual TikTok Ads ETL executor")
+    parser = argparse.ArgumentParser(
+        description="Manual TikTok Ads ETL executor"
+        )
+    
     parser.add_argument(
         "--start_date",
         required=True,
         help="Start date in YYYY-MM-DD format"
     )
+
     parser.add_argument(
         "--end_date",
         required=True,
         help="End date in YYYY-MM-DD format"
     )
+    
     args = parser.parse_args()
 
     try:
+        
         start_date = datetime.strptime(args.start_date, "%Y-%m-%d").strftime("%Y-%m-%d")
+        
         end_date = datetime.strptime(args.end_date, "%Y-%m-%d").strftime("%Y-%m-%d")
+    
     except ValueError:
-        raise ValueError("❌ [BACKFILL] Failed to execute TikTok Ads campaign insights update due to start_date and end_date must be in YYYY-MM-DD format.")
+    
+        raise ValueError(
+            "❌ [BACKFILL] Failed to execute TikTok Ads campaign insights backfill due to start_date and end_date must be in YYYY-MM-DD format."
+        )
 
     if start_date > end_date:
-        raise ValueError("❌ [BACKFILL] Failed to execute TikTok Ads campaign insights update due to start_date must be less than or equal to end_date.")
+    
+        raise ValueError(
+            "❌ [BACKFILL] Failed to execute TikTok Ads campaign insights backfill due to start_date must be less than or equal to end_date."
+        )
 
     print(
-        "🔄 [BACKFILL] Triggering to execute TikTok Ads campaign insights update for "
+        "🔄 [BACKFILL] Triggering to execute TikTok Ads campaign insights backfill for "
         f"{ACCOUNT} account of "
         f"{DEPARTMENT} department in "
         f"{COMPANY} company from "
@@ -74,7 +95,10 @@ def backfill():
 
 # Initialize Google Secret Manager
     try:
-        print("🔍 [BACKFILL] Initialize Google Secret Manager client...")        
+        
+        print(
+            "🔍 [BACKFILL] Initialize Google Secret Manager client..."
+        )
         
         google_secret_client = secretmanager.SecretManagerServiceClient(
             client_options=ClientOptions(
@@ -82,9 +106,12 @@ def backfill():
             )
         )
 
-        print("✅ [BACKFILL] Successfully initialized Google Secret Manager client.")
+        print(
+            "✅ [BACKFILL] Successfully initialized Google Secret Manager client."
+        )
     
     except Exception as e:
+        
         raise RuntimeError(
             "❌ [BACKFILL] Failed to initialize Google Secret Manager client due to."
             f"{e}."
@@ -92,9 +119,11 @@ def backfill():
         
 # Resolve advertiser_id from Google Secret Manager
     try:
+        
         secret_account_id = (
             f"{COMPANY}_secret_{DEPARTMENT}_tiktok_account_id_{ACCOUNT}"
         )
+        
         secret_account_name = (
             f"projects/{PROJECT}/secrets/{secret_account_id}/versions/latest"
         )
@@ -108,6 +137,7 @@ def backfill():
             name=secret_account_name,
             timeout=10.0,
         )
+        
         advertiser_id = secret_account_response.payload.data.decode("utf-8")
         
         print(
@@ -116,6 +146,7 @@ def backfill():
         )
     
     except Exception as e:
+        
         raise RuntimeError(
             "❌ [BACKFILL] Failed to retrieve TikTok Ads advertiser_id from Google Secret Manager due to "
             f"{e}."
@@ -123,9 +154,11 @@ def backfill():
 
 # Resolve access_token from Google Secret Manager
     try:
+        
         secret_token_id = (
             f"{COMPANY}_secret_all_tiktok_token_access_user"
         )
+        
         secret_token_name = (
             f"projects/{PROJECT}/secrets/{secret_token_id}/versions/latest"
         )
@@ -138,13 +171,17 @@ def backfill():
         secret_token_response = google_secret_client.access_secret_version(
             name=secret_token_name
         )
+        
         access_token = secret_token_response.payload.data.decode("utf-8")
         
-        print("✅ [BACKFILL] Successfully retrieved TikTok Ads access token from Google Secret Manager.")
+        print(
+            "✅ [BACKFILL] Successfully retrieved TikTok Ads access token from Google Secret Manager."
+        )
     
     except Exception as e:
+        
         raise RuntimeError(
-            "❌ [BACKFILL] Failed to retrieve TikTok Ads access token from Google Secret Manager due to "
+        "❌ [BACKFILL] Failed to retrieve TikTok Ads access token from Google Secret Manager due to "
             f"{e}."
         )        
    
@@ -158,7 +195,11 @@ def backfill():
 
 # Entrypoint
 if __name__ == "__main__":
+    
     try:
+    
         backfill()
+    
     except Exception:
+    
         sys.exit(1)

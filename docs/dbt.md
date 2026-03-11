@@ -1,14 +1,14 @@
-# Data Build Tool for TikTok Ads SQL Materialization
+# Data Build Tool for TikTok Ads
 
 ## Purpose
 
-- Use **dbt** to build TikTok analytics-ready **materialized tables** in **Google BigQuery**
+- Use **dbt** to build TikTok Ads analytics-ready **materialized tables** in **Google BigQuery**
 
-- Used **dbt** only for **SQL transformations** and all ELT processes are handled upstream
+- Used **dbt** only for **SQL transformations** and all ETL processes are handled upstream
 
 - Join TikTok Ads campaign insights fact tables with campaign metadata dim table
 
-- Join TikTok Ads ad insights fact tables with campaign metadata/adset metadata/ad metadata/ad creative dim tables
+- Join TikTok Ads ad insights fact tables with campaign metadata/ad metadata/ad creative dim tables
 
 - Define final analytical grain and manage model dependencies using `ref()`
 
@@ -16,24 +16,16 @@
 
 ## Install
 
-### Switch to Python 3.13 Interpreter
-- Explicitly choose the correct Python interpreter if multiple versions was installed
+### Activate Python venv
 
-- Create a Python virtual environment using Python 3.13 interpreter when run from the root folder
+- Create Python virtual environment if `venv\` folder not exists
 ```bash
-& "C:\Users\ADMIN\AppData\Local\Programs\Python\Python313\python.exe" -m venv venv
+python -m venv venv
 ```
-
-- Check available Python interpreter if there is any uncertainty by press `Ctrl + Shift + P` then select `Python: Select Interpreter`
 
 - Activate Python virtual environment and check `(venv)` in the terminal
 ```bash
 venv/scripts/activate
-```
-
-- Verify Python virtual environment and check Python Interpreter version
-```bash
-python --version
 ```
 
 ---
@@ -108,10 +100,10 @@ dbt build
 
 - Run only campaign insights
 ```bash
-$env:PROJECT="seer-digital-ads"
-$env:COMPANY="kids"
-$env:DEPARTMENT="marketing"
-$env:ACCOUNT="main"
+$env:PROJECT="your-gcp-project"
+$env:COMPANY="your-company-in-short"
+$env:DEPARTMENT="your-department"
+$env:ACCOUNT="your-account"
 
 dbt build `
   --project-dir dbt `
@@ -121,16 +113,18 @@ dbt build `
 
 - Run only ad insights
 ```bash
-$env:PROJECT="seer-digital-ads"
-$env:COMPANY="kids"
-$env:DEPARTMENT="marketing"
-$env:ACCOUNT="main"
+$env:PROJECT="your-gcp-project"
+$env:COMPANY="your-company-in-short"
+$env:DEPARTMENT="your-department"
+$env:ACCOUNT="your-account"
 
 dbt build `
   --project-dir dbt `
   --profiles-dir dbt `
   --select tag:ad
 ```
+
+---
 
 ### Deployment with DAGs
 

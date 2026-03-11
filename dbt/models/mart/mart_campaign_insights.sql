@@ -35,11 +35,9 @@ select
     platform,
     objective,
     region,
-    budget_group_1,
-    budget_group_2,   
+    budget_group,
     category_level_1,
-    personnel,
-    track_group,
-    pillar_group,
-    content_group
+    track,
+    pillar,
+    `group`
 from {{ ref('int_campaign_insights') }}

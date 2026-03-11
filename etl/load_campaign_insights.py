@@ -14,25 +14,29 @@ def load_campaign_insights(
 ) -> None:
     """
     Load TikTok Ads campaign insights
-    ----------------------
-    Workflow:
+    ---
+    Principles:
         1. Validate input DataFrame
         2. Validate output direction for Google BigQuery
         3. Set primary key(s) to date
         4. Use UPSERT mode with parameterized query for deduplication
         5. Make internalGoogleBigQueryLoader API call
-    ---------
+    ---
     Returns:
         None
     """    
 
     if df.empty:
-        print("⚠️ [LOADER] Empty TikTok Ads campaign insights Dataframe then loading will be suspended.")
+        
+        print(
+            "⚠️ [LOADER] Empty TikTok Ads campaign insights then loading will be suspended."
+        )
+        
         return
 
     print(
-        "🔄 [LOADER] Triggering to load "
-        f"{len(df)} row(s) of TikTok Ads campaign insights to Google BigQuery table "
+        "🔄 [LOADER] Triggering to load TikTok Ads campaign insights with "
+        f"{len(df)} row(s) to Google BigQuery table "
         f"{direction}..."
         )
 

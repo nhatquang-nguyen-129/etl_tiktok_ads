@@ -14,25 +14,29 @@ def load_ad_creative(
 ) -> None:
     """
     Load TikTok Ads ad creative
-    ---------
-    Workflow:
+    ---
+    Principles:
         1. No need input ad_ids
         2. Validate output direction for Google BigQuery
         3. Set primary key(s) to advertiser_id and ad_id
         4. Use UPSERT mode with temporary table for deduplication
         5. Make internalGoogleBigQueryLoader API call
-    ---------
+    ---
     Returns:
         None
     """      
 
     if df.empty:
-        print("⚠️ [LOADER] Empty TikTok Ads ad creative Dataframe then loading will be suspended.")
+        
+        print(
+            "⚠️ [LOADER] Empty TikTok Ads ad creative then loading will be suspended."
+        )
+        
         return
 
     print(
-        "🔄 [LOADER] Triggering to load "
-        f"{len(df)} row(s) of TikTok Ads ad creative to Google BigQuery table "
+        "🔄 [LOADER] Triggering to load TikTok Ads ad creative with "
+        f"{len(df)} row(s) to Google BigQuery table "
         f"{direction}..."
     )
     

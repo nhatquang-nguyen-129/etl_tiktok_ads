@@ -9,25 +9,31 @@ def transform_ad_metadata(
     df: pd.DataFrame
 ) -> pd.DataFrame:
     """
-    Transform TikTok Ads ad metadata
-    ---------
-    Workflow:
-        1. Validate input
-        2. Validate missing columns
-        3. Assign enriched columns
-    ---------
+    Transform TikTok Ads adset metadata
+    ---
+    Principles:
+        1. Validate input Dataframe
+        2. Validate required schema columns
+        3. Create copy to prevent side effects
+        4. Parse structured naming convention
+        5. Enrich Dataframe
+    ---
     Returns:
         1. DataFrame:
             Enforced ad metadata records
     """
 
     print(
-        "🔄 [TRANSFORM] Transforming "
-        f"{len(df)} row(s) of TikTok Ads ad metadata..."
+        "🔄 [TRANSFORM] Transforming TikTok Ads ad metadata with "
+        f"{len(df)} row(s)..."
     )
 
     if df.empty:
-        print("⚠️ [TRANSFORM] Empty ad metadata then transformation will be suspended.")
+        
+        print(
+            "⚠️ [TRANSFORM] Empty ad metadata then transformation will be suspended."
+        )
+        
         return df
 
     required_cols = {
@@ -39,13 +45,16 @@ def transform_ad_metadata(
         }
     
     missing = required_cols - set(df.columns)
+    
     if missing:
+    
         raise ValueError (
             "❌ [TRANSFORM] Failed to transform TikTok Ads ad metadata due to missing columns "
             f"{missing} then transformation will be suspended."
         )
 
     df = df.copy()
+    
     df = df.assign(
         location=lambda df: df["adgroup_name"].fillna("").str.split("|").str[0].fillna("unknown"),
         gender=lambda df: df["adgroup_name"].fillna("").str.split("|").str[1].fillna("unknown"),
@@ -53,14 +62,14 @@ def transform_ad_metadata(
         audience=lambda df: df["adgroup_name"].fillna("").str.split("|").str[3].fillna("unknown"),
         format=lambda df: df["adgroup_name"].fillna("").str.split("|").str[4].fillna("unknown"),
         strategy=lambda df: df["adgroup_name"].fillna("").str.split("|").str[5].fillna("unknown"),
-        type=lambda df: df["adgroup_name"].fillna("").str.split("|").str[6].fillna("unknown"),
-        pillar=lambda df: df["adgroup_name"].fillna("").str.split("|").str[7].fillna("unknown"),
-        content=lambda df: df["adgroup_name"].fillna("").str.split("|").str[8].fillna("unknown")
+        angle=lambda df: df["adgroup_name"].fillna("").str.split("|").str[6].fillna("unknown"),
+        content=lambda df: df["adgroup_name"].fillna("").str.split("|").str[7].fillna("unknown"),
+        type=lambda df: df["adgroup_name"].fillna("").str.split("|").str[8].fillna("unknown")
     )  
 
     print(
-        "✅ [TRANSFORM] Successfully transformed "
-        f"{len(df)} row(s) of TikTok Ads ad metadata."
+        "✅ [TRANSFORM] Successfully transformed TikTok Ads ad metadata with "
+        f"{len(df)} row(s)."
     )
 
     return df

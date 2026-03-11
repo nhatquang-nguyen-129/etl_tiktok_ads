@@ -40,23 +40,22 @@ select
     campaign_name,
     platform,
     objective,
-    budget_group_1,
-    budget_group_2,
+    budget_group,
     region,
     category_level_1,
-    track_group,
-    pillar_group,
-    content_group,
+    track,
+    pillar,
+    `group`,
 
     adgroup_name,
     location,
     gender,
     age,
     audience,
-    format,
+    `format`,
     strategy,
-    type,
-    pillar,
-    content
+    angle,
+    content,
+    `type`
 
 from {{ ref('int_ad_insights') }}

@@ -1,9 +1,9 @@
+import os
 import sys
 from pathlib import Path
 ROOT_FOLDER_LOCATION = Path(__file__).resolve().parents[0]
 sys.path.append(str(ROOT_FOLDER_LOCATION))
 
-import os
 import subprocess
 
 def dbt_tiktok_ads(
@@ -12,17 +12,17 @@ def dbt_tiktok_ads(
     select: str
 ):
     """
-    Run dbt for TikTok Ads
-    ---------
-    Workflow:
-        1. Initialize dbt execution environment
-        2. Initialize Python subprocess to execute CLI
-        3. Execute dbt build command with environment variables
-        4. Execute dbt build command for dbt models stg/int/mart
-        3. Capture dbt execution status with stdout and stderr
-    ---------
+    DBT Execution for TikTok Ads
+    ---
+    Principles:
+        1. Initialize dbt CLI execution environment
+        2. Construct dbt build command with model selection
+        3. Execute dbt build within project directory context
+        4. Capture subprocess execution status and surface failures
+        5. Finalize execution with success confirmation
+    ---
     Returns:
-        None
+        1. None:
     """
 
     cmd = [
@@ -30,32 +30,52 @@ def dbt_tiktok_ads(
         "build",
         "--profiles-dir", ".",
         "--select", select,
+        "--no-write-json"
     ]
 
     print(
-        "🔄 [DBT] Executing dbt build for TikTok Ads "
-        f"{select} insights to Google Cloud Project "
+        f"🔄 [DBT] Executing dbt build for TikTok Ads "
+        f"{select} to Google Cloud Project "
         f"{google_cloud_project}..."
     )
 
     try:
-        subprocess.run(
+
+        process = subprocess.Popen(
             cmd,
             cwd="dbt",
             env=os.environ,
-            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            bufsize=1
         )
 
+        for line in process.stdout:
+
+            print(line, end="")
+
+        process.wait()
+
+        if process.returncode != 0:
+
+            raise RuntimeError(
+                "❌ [DBT] Failed to execute dbt build for TikTok Ads "
+                f"{select} to Google Cloud Project "
+                f"{google_cloud_project} with return code "
+                f"{process.returncode}."
+            )
+
         print(
-            "✅ [DBT] Successfully executed dbt build for TikTok Ads "
-            f"{select} insights to Google Cloud Project "
+            f"✅ [DBT] Successfully executed dbt build for TikTok Ads "
+            f"{select} to Google Cloud Project "
             f"{google_cloud_project}."
         )
 
-    except subprocess.CalledProcessError as e:
+    except Exception as e:
+        
         raise RuntimeError(
-            "❌ [DBT] Failed to execute dbt build for TikTok Ads "
-            f"{select} insights to Google Cloud Project "
-            f"{google_cloud_project} due to "
-            f"{e}."
+            "❌ [DBT] Unexpected error while executing dbt build for TikTok Ads "
+            f"{select} to Google Cloud Project "
+            f"{google_cloud_project}: {e}"
         ) from e

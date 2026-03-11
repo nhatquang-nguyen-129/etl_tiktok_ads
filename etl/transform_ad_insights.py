@@ -10,26 +10,30 @@ def transform_ad_insights(
 ) -> pd.DataFrame:
     """
     Transform TikTok Ads ad insights
-    ---------
-    Workflow:
+    ---
+    Principles:
         1. Validate input
         2. Parse actions
         3. No need to resolve results
         4. Normalize date dimension
         5. Enforce numeric schema
-    ---------
+    ---
     Returns:
         1. DataFrame:
             Enforced ad insights records
     """
 
     print(
-        "🔄 [TRANSFORM] Transforming "
-        f"{len(df)} row(s) of TikTok Ads ad insights..."
+        "🔄 [TRANSFORM] Transforming TikTok Ads ad insights with "
+        f"{len(df)} row(s)..."
     )
 
     if df.empty:
-        print("⚠️ [TRANSFORM] Empty TikToks Ads ad insights then transformation will be suspended.")
+        
+        print(
+            "⚠️ [TRANSFORM] Empty TikToks Ads ad insights then transformation will be suspended."
+        )
+        
         return df
 
     required_cols = {
@@ -37,7 +41,9 @@ def transform_ad_insights(
     }
 
     missing = required_cols - set(df.columns)
+    
     if missing:
+    
         raise ValueError(
             "❌ [TRANSFORM] Failed to transform TikTok Ads ad insights due to missing columns "
             f"{missing} then transformation will be suspended."
@@ -57,14 +63,20 @@ def transform_ad_insights(
         "purchase",
         "messaging_total_conversation_tiktok_direct_message",
     ]:
+        
         if col in df.columns:
+            
             df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
 
     # Normalize date dimension
     if "stat_time_day" in df.columns:
+        
         dt = pd.to_datetime(df["stat_time_day"], errors="coerce", utc=True)
+        
         df["date"] = dt.dt.floor("D")
+        
         df["year"] = dt.dt.year
+        
         df["month"] = dt.dt.strftime("%Y-%m")
 
     # Drop raw columns
@@ -74,8 +86,8 @@ def transform_ad_insights(
     )
 
     print(
-        "✅ [TRANSFORM] Successfully transformed "
-        f"{len(df)} row(s) of TikTok Ads ad insights."
+        "✅ [TRANSFORM] Successfully transformed TikTok Ads ad insights with "
+        f"{len(df)} row(s)."
     )
 
     return df
