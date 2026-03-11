@@ -192,8 +192,8 @@ def extract_ad_creative(
     df = pd.DataFrame(rows)
 
     print(
-        "✅ [EXTRACT] Successfully extracted "
-        f"{len(df)} row(s) of TikTok Ads ad creative for advertiser_id "
+        "✅ [EXTRACT] Successfully extracted TikTok Ads ad creative with "
+        f"{len(df)} row(s) for advertiser_id "
         f"{advertiser_id}."
     )
 
