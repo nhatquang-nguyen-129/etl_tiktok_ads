@@ -86,7 +86,7 @@ def transform_ad_insights(
     )
 
     print(
-        "✅ [TRANSFORM] Successfully transformed TikTok Ads ad insights "
+        "✅ [TRANSFORM] Successfully transformed TikTok Ads ad insights with "
         f"{len(df)} row(s)."
     )
 
