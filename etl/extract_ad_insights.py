@@ -27,7 +27,7 @@ def extract_ad_insights(
             Flattened ad insights records
     """
 
-    # Validate input 
+    # Validate input
     headers = {
         "Access-Token": access_token,
         "Content-Type": "application/json",
