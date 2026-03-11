@@ -218,6 +218,7 @@ def dags_ad_insights(
             )
 
             if not df_ad_metadata.empty:
+                
                 dfs_ad_metadata.append(df_ad_metadata)
 
             success_ad_ids = set(df_ad_metadata["ad_id"].dropna().unique())
