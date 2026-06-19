@@ -2,9 +2,7 @@
   <img src="kidsplaza.png" alt="KidsPlaza Logo" width="300"/>
 </p>
 
-This pipeline integrates **TikTok Ads Insights data**, supporting both **daily synchronization** and **historical backfills**.
-
-The system is designed with a **modular architecture** to ensure maintainability, scalability, and controlled evolution over time.
+This repository integrates **TikTok Ads data**, supporting both **daily synchronization** and **historical backfills**.
 
 ---
 
@@ -13,7 +11,7 @@ The system is designed with a **modular architecture** to ensure maintainability
 > **This README documents the behavior and scope of the current architecture development branch:**  
 > **`branch_2x`**
 
-`branch_2x` represents the active **2.x development line**, focusing on large-scale feature upgrades and platform standardization—migrating from raw Python/SQL execution to structured DAG-based pipelines with dbt, standardized ETL and backfill support, scalable internal plugins, and modern dependency management via conditional installs and pip-tools compilation.
+`branch_2x` represents the active **2.x development line**.
 
 ## Deployment
 
@@ -22,41 +20,18 @@ development_branch → main → deploy
 | Branch | Purpose |
 |------|--------|
 | `main` | **Production** – stable, deployed pipeline |
-| `current_branch` | Active development for oldest version **x.x** (current branch) |
-| `development_branch` | Major architectural redesigns or framework rewrites |
+| `current_branch` | Active development for oldest version **x.x** |
+| `development_branch` | Major architectural redesigns |
 
 ---
 
 ## Ownership
 
 ```text
-This repository is maintained by the Digital Marketng Team at KidsPlaza.
-
-For questions, access requests, or contributions, please contact:
-
 - Internal: quang.nn@kidsplaza.vn  
 - External: nhatquang.nguyen.129@gmail.com  
 Or reach out via the internal Slack channel #data-engineering
 
-⚠️ Disclaimer:
+Disclaimer:
 
 This project is intended for **internal use only**.
-
-It contains custom business logic tailored specifically to KidsPlaza’s retail data structures, sales processes, reconciliation rules, and naming conventions.  
-Do **not** reuse, replicate, or adapt this codebase outside of KidsPlaza without prior approval.
-
----
-
-📄 License
-
-All content and source code in this repository is **proprietary to KidsPlaza**.
-
-Redistribution, publication, or open-sourcing of any part of this project is strictly prohibited without explicit written consent from the company.
-
----
-
-🤖 AI-Assisted Development
-
-This repository includes code, documentation, and architectural guidance that has been partially developed or enhanced using AI tools (e.g. GitHub Copilot, ChatGPT by OpenAI), under the supervision of the development team.
-
-All AI-assisted output has been reviewed, validated, and adapted to meet KidsPlaza’s internal engineering and production standards.

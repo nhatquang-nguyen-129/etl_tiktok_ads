@@ -6,6 +6,7 @@ sys.path.append(str(ROOT_FOLDER_LOCATION))
 
 import argparse
 from datetime import datetime
+import traceback
 
 from google.cloud import secretmanager
 from google.api_core.client_options import ClientOptions
@@ -46,7 +47,7 @@ def backfill():
         None
     """
 
-# CLI arguments parser for manual date range
+    # CLI arguments parser for manual date range
     parser = argparse.ArgumentParser(
         description="Manual TikTok Ads ETL executor"
         )
@@ -93,7 +94,7 @@ def backfill():
         f"{PROJECT}..."
     )
 
-# Initialize Google Secret Manager
+    # Initialize Google Secret Manager
     try:
     
         print(
@@ -117,7 +118,7 @@ def backfill():
             f"{e}."
         )
         
-# Resolve advertiser_id from Google Secret Manager
+    # Resolve advertiser_id from Google Secret Manager
     try:
     
         secret_account_id = (
@@ -152,7 +153,7 @@ def backfill():
             f"{e}."
         )
 
-# Resolve access_token from Google Secret Manager
+    # Resolve access_token from Google Secret Manager
     try:
         
         secret_token_id = (
@@ -185,7 +186,7 @@ def backfill():
             f"{e}."
         )        
 
-# Execute DAGS
+    # Execute DAGS
     dags_tiktok_ads(
         access_token=access_token,
         advertiser_id=advertiser_id,
@@ -193,13 +194,19 @@ def backfill():
         end_date=end_date
     )
 
-# Entrypoint
+    # Entrypoint
 if __name__ == "__main__":
-    
+
     try:
-    
+
         backfill()
-    
+
     except Exception:
-    
+
+        print(
+            "❌ [BACKFILL] Failed to execute TikTok Ads backfill due to..."
+        )
+
+        traceback.print_exc()
+
         sys.exit(1)

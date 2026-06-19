@@ -14,9 +14,9 @@
 
 ---
 
-## Install
+## Install for Windows
 
-### Activate Python venv
+### Activate Python virtual environment
 
 - Create Python virtual environment if `venv\` folder not exists
 ```bash
@@ -26,6 +26,36 @@ python -m venv venv
 - Activate Python virtual environment and check `(venv)` in the terminal
 ```bash
 venv/scripts/activate
+```
+
+---
+
+### Install dbt adapter for Google BigQuery
+
+- Install dbt adapter for Google BigQuery using the terminal
+```bash
+pip install dbt-core dbt-bigquery
+```
+
+- Verify installation and check installed dbt version
+```bash
+dbt --version
+```
+
+---
+
+## Install for MacOS
+
+### Activate Python virtual environment
+
+- Create Python virtual environment if `venv\` folder not exists
+```bash
+python3.13 -m venv venv
+```
+
+- Activate Python virtual environment and check `(venv)` in the terminal
+```bash
+source venv/bin/activate
 ```
 
 ---
@@ -86,7 +116,7 @@ dbt --version
 
 ## Deployment
 
-### Manual Deployment
+### Manual Deployment for Windows
 
 - Complie only with no execution
 ```bash
@@ -122,6 +152,46 @@ dbt build `
   --project-dir dbt `
   --profiles-dir dbt `
   --select tag:ad
+```
+
+---
+
+### Manual Deployment for MacOS
+
+- Complie only with no execution
+```bash
+dbt compile
+```
+
+- Run all models
+```bash
+dbt build
+```
+
+- Run only campaign insights
+```bash
+export PROJECT="your-gcp-project"
+export COMPANY="your-company-in-short"
+export DEPARTMENT="your-department"
+export ACCOUNT="your-account"
+
+dbt build \
+  --project-dir dbt \
+  --profiles-dir dbt \
+  --select tag:campaign
+```
+
+- Run only ad insights
+```bash
+export PROJECT="your-gcp-project"
+export COMPANY="your-company-in-short"
+export DEPARTMENT="your-department"
+export ACCOUNT="your-account"
+
+dbt build \
+  --project-dir dbt \
+  --profiles-dir dbt \
+  --select tag:campaign
 ```
 
 ---
