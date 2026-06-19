@@ -6,9 +6,9 @@
 
 ---
 
-## Install
+## Install required libraries
 
-### Switch to Python 3.13 Interpreter
+### Windows
 
 - Multiple Python versions can and should coexist on the same machine, especially for local development.
 
@@ -19,7 +19,7 @@
 & "C:\Users\ADMIN\AppData\Local\Programs\Python\Python313\python.exe" -m venv venv
 ```
 
-- Check available Python interpreter if there is any uncertainty by press `Ctrl + Shift + P` then select `Python: Select Interpreter`
+- Verify Python Interpreter in VS Code by opening the Command Palette `Command + Shift + P` then select `Python: Select Interpreter`
 
 - Activate Python virtual environment and check `(venv)` in the terminal
 ```bash
@@ -33,7 +33,55 @@ python --version
 
 ---
 
-### Use pip-tools to render exact libraries version
+### MacOS
+
+- Multiple Python versions can and should coexist on the same machine, especially for local development.
+
+- Explicitly choose the correct Python interpreter if multiple versions was installed
+
+- Install Python 3.13.x on MacOS with Homebrew
+```bash
+brew install python@3.13
+```
+
+- Verify all installed Python versions:
+```bash
+which -a python3
+```
+
+- Verify Python 3.13 is available:
+```bash
+python3.13 --version
+```
+
+- Create a Python virtual environment using the Python 3.13 interpreter from the project root directory:
+```bash
+python3.13 -m venv venv
+```
+
+- Verify the virtual environment was created:
+```bash
+ls venv
+```
+
+- Activate the virtual environment and check `(venv)` in the terminal
+```bash
+source venv/bin/activate
+```
+
+- Verify the active Python interpreter:
+```bash
+which python
+```
+
+- Verify Python Interpreter in VS Code by opening the Command Palette `Command + Shift + P` then select `Python: Select Interpreter` and choose 
+```bash
+./venv/bin/python
+```
+
+---
+
+## Use pip-tools to render exact libraries version
 
 - Edit `base.in` to change dependencies instead `.txt` files manually to avoid conflict
 
@@ -50,4 +98,14 @@ pip-compile requirements/base.in -o requirements/base.txt
 - Install exact libraries version
 ```bash
 pip install -r requirements/base.txt
+```
+
+- Check installed packages
+```bash
+pip list
+```
+
+- Check dependency tree
+```bash
+pip freeze
 ```
