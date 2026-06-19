@@ -102,7 +102,7 @@ def dags_ad_insights(
                     
                     break
 
-    # Transform
+        # Transform
                 print(
                     "🔄 [DAGS] Trigger to transform TikTok Ads ad insights from advertiser_id "
                     f"{advertiser_id} with "
@@ -112,7 +112,7 @@ def dags_ad_insights(
 
                 insights = transform_ad_insights(insights)
 
-    # Load
+        # Load
                 year  = pd.to_datetime(insights["date"].iloc[0]).year
                 
                 month = pd.to_datetime(insights["date"].iloc[0]).month
@@ -188,7 +188,7 @@ def dags_ad_insights(
 
             time.sleep(DAGS_INSIGHTS_COOLDOWN)
 
-# ETL for TikTok Ads ad metadata
+    # ETL for TikTok Ads ad metadata
     DAGS_AD_ATTEMPTS = 3
 
     if not total_ad_ids:
@@ -208,7 +208,7 @@ def dags_ad_insights(
 
     for attempt in range(1, DAGS_AD_ATTEMPTS + 1):
 
-    # Extract
+        # Extract
         try:
 
             print(
@@ -287,7 +287,7 @@ def dags_ad_insights(
         
     )
 
-    # Transform
+        # Transform
     print(
         "🔄 [DAGS] Trigger to transform TikTok Ads campaign metadata for "
         f"{len(df_ad_metadatas)} row(s)..."
@@ -313,7 +313,7 @@ def dags_ad_insights(
         direction=_ad_metadata_direction,
     )
 
-# ETL for TikTok Ads ad creative
+    # ETL for TikTok Ads ad creative
     DAGS_CREATIVE_ATTEMPTS = 3
 
     dfs_ad_creative = []
@@ -375,11 +375,11 @@ def dags_ad_insights(
 
     df_ad_creatives = pd.concat(dfs_ad_creative, ignore_index=True)
 
-    # Transform
+        # Transform
 
-        # Nothing to transform with TikTok Ads ad creative
+            # Nothing to transform with TikTok Ads ad creative
 
-    # Load
+        # Load
     _ad_creative_direction = (
             f"{PROJECT}."
             f"{COMPANY}_dataset_tiktok_api_raw."
@@ -397,7 +397,7 @@ def dags_ad_insights(
         direction=_ad_creative_direction,
     )
 
-# ETL for TikTok Ads campaign metadata
+    # ETL for TikTok Ads campaign metadata
     DAGS_CAMPAIGN_ATTEMPTS = 3
 
     total_campaign_ids = set(df_ad_metadatas["campaign_id"].dropna().unique())
@@ -419,7 +419,7 @@ def dags_ad_insights(
 
     for attempt in range(1, DAGS_CAMPAIGN_ATTEMPTS + 1):
 
-    # Extract
+        # Extract
         try:
 
             print(
@@ -496,7 +496,7 @@ def dags_ad_insights(
         f"{attempt}/{DAGS_CAMPAIGN_ATTEMPTS} attempts in total."
     )
 
-    # Transform
+        # Transform
     print(
         "🔄 [DAGS] Trigger to transform TikTok Ads campaign metadata for "
         f"{len(df_campaign_metadatas)} row(s)..."
@@ -504,7 +504,7 @@ def dags_ad_insights(
 
     df_campaign_metadatas = transform_campaign_metadata(df_campaign_metadatas)
 
-    # Load
+        # Load
     _campaign_metadata_direction = (
         f"{PROJECT}."
         f"{COMPANY}_dataset_tiktok_api_raw."
@@ -522,7 +522,7 @@ def dags_ad_insights(
         direction=_campaign_metadata_direction,
     )
    
-# Materialization with dbt
+    # Materialization with dbt
     print(
         "🔄 [DAGS] Trigger to materialize TikTok Ads ad insights with dbt..."
     )
