@@ -77,5 +77,6 @@ def dbt_tiktok_ads(
         raise RuntimeError(
             "❌ [DBT] Unexpected error while executing dbt build for TikTok Ads "
             f"{select} to Google Cloud Project "
-            f"{google_cloud_project}: {e}"
+            f"{google_cloud_project} due to "
+            f"{e}."
         ) from e
