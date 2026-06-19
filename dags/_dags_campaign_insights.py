@@ -53,7 +53,7 @@ def dags_campaign_insights(
         f"{end_date}..."
     )
 
-# ETL for TikTok Ads campaign insights
+    # ETL for TikTok Ads campaign insights
     DAGS_INSIGHTS_ATTEMPTS = 3
     
     DAGS_INSIGHTS_COOLDOWN = 60
@@ -72,7 +72,7 @@ def dags_campaign_insights(
     
             try:
 
-    # Extract
+        # Extract
                 print(
                     "🔄 [DAGS] Trigger to extract TikTok Ads campaign insights from advertiser_id "
                     f"{advertiser_id} with "
@@ -97,7 +97,7 @@ def dags_campaign_insights(
                     
                     break
 
-    # Transform
+        # Transform
                 print(
                     "🔄 [DAGS] Trigger to transform TikTok Ads campaign insights from advertiser_id "
                     f"{advertiser_id} with "
@@ -107,7 +107,7 @@ def dags_campaign_insights(
 
                 insights = transform_campaign_insights(insights)
 
-    # Load
+        # Load
                 year  = pd.to_datetime(insights["date"].iloc[0]).year
                 
                 month = pd.to_datetime(insights["date"].iloc[0]).month
@@ -183,7 +183,7 @@ def dags_campaign_insights(
 
             time.sleep(DAGS_INSIGHTS_COOLDOWN)
 
-# ETL for TikTok Ads campaign metadata
+    # ETL for TikTok Ads campaign metadata
     DAGS_CAMPAIGN_ATTEMPTS = 3
 
     if not total_campaign_ids:
@@ -203,7 +203,7 @@ def dags_campaign_insights(
 
     for attempt in range(1, DAGS_CAMPAIGN_ATTEMPTS + 1):
 
-    # Extract
+        # Extract
         try:
 
             print(
@@ -280,7 +280,7 @@ def dags_campaign_insights(
         f"{attempt}/{DAGS_CAMPAIGN_ATTEMPTS} attempts in total."
     )
 
-    # Transform
+        # Transform
     print(
         "🔄 [DAGS] Trigger to transform TikTok Ads campaign metadata for "
         f"{len(df_campaign_metadatas)} row(s)..."
@@ -288,7 +288,7 @@ def dags_campaign_insights(
 
     df_campaign_metadatas = transform_campaign_metadata(df_campaign_metadatas)
 
-    # Load
+        # Load
     _campaign_metadata_direction = (
         f"{PROJECT}."
         f"{COMPANY}_dataset_tiktok_api_raw."
@@ -306,7 +306,7 @@ def dags_campaign_insights(
         direction=_campaign_metadata_direction,
     )
 
-# Materialization with dbt
+    # Materialization with dbt
     print(
         "🔄 [DAGS] Trigger to materialize TikTok Ads campaign insights with dbt..."
     )
