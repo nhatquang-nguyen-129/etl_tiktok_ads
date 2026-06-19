@@ -4,8 +4,12 @@ from pathlib import Path
 ROOT_FOLDER_LOCATION = Path(__file__).resolve().parents[1]
 sys.path.append(str(ROOT_FOLDER_LOCATION))
 
-from datetime import datetime, timedelta
+from datetime import (
+    datetime, 
+    timedelta
+)
 from zoneinfo import ZoneInfo
+import traceback
 
 from google.cloud import secretmanager
 from google.api_core.client_options import ClientOptions
@@ -57,7 +61,7 @@ def main():
         f"{PROJECT}..."
     )
 
-# Resolve input time range
+    # Resolve input time range
     ICT = ZoneInfo("Asia/Ho_Chi_Minh")
     
     today = datetime.now(ICT)
@@ -106,7 +110,7 @@ def main():
         f"{end_date}."
     )
 
-# Initialize Google Secret Manager
+    # Initialize Google Secret Manager
     try:
         
         print(
@@ -130,7 +134,7 @@ def main():
             f"{e}."
         )
         
-# Resolve advertiser_id from Google Secret Manager
+    # Resolve advertiser_id from Google Secret Manager
     try:
         
         secret_account_id = (
@@ -165,7 +169,7 @@ def main():
             f"{e}."
         )
 
-# Resolve access_token from Google Secret Manager
+    # Resolve access_token from Google Secret Manager
     try:
         
         secret_token_id = (
@@ -198,7 +202,7 @@ def main():
             f"{e}."
         )        
 
-# Execute DAGS
+    # Execute DAGS
     dags_tiktok_ads(
         access_token=access_token,
         advertiser_id=advertiser_id,
@@ -206,13 +210,19 @@ def main():
         end_date=end_date
     )
 
-# Entrypoint
+    # Entrypoint
 if __name__ == "__main__":
-    
+
     try:
-    
+
         main()
-    
+
     except Exception:
-    
+
+        print(
+            "❌ [MAIN] Failed to execute TikTok Ads main entrypoint due to..."
+        )
+
+        traceback.print_exc()
+
         sys.exit(1)
