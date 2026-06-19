@@ -23,6 +23,7 @@ def transform_ad_metadata(
             Enforced ad metadata records
     """
 
+    # Validate input
     print(
         "🔄 [TRANSFORM] Validating column(s) for "
         f"{len(df)} row(s) of TikTok Ads ad metadata..."
