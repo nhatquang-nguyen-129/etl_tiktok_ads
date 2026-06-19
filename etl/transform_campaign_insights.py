@@ -23,33 +23,47 @@ def transform_campaign_insights(
             Enforced campaign insights records
     """
 
+    # Validate input
     print(
-        "🔄 [TRANSFORM] Transforming TikTok Ads campaign insights with "
-        f"{len(df)}..."
+        "🔄 [TRANSFORM] Validating column(s) for "
+        f"{len(df)} row(s) of TikTok Ads campaign insights..."
     )
 
     if df.empty:
-        
-        print(
-            "⚠️ [TRANSFORM] Empty TikTok Ads campaign insights then transformation will be suspended."
+
+        raise ValueError(
+            "❌ [TRANSFORM] Failed to validate column(s) for TikTok Ads campaign insights due to empty input DataFrame."
         )
-        
-        return df
 
     required_cols = {
         "stat_time_day"
     }
 
-    missing = required_cols - set(df.columns)
-    
-    if missing:
-    
+    actual_cols = {
+        str(col).strip()
+        for col in df.columns
+    }
+
+    missing_cols = required_cols - actual_cols
+
+    extra_cols = actual_cols - required_cols
+
+    print(
+        "✅ [TRANSFORM] Successfully validated DataFrame for TikTok Ads campaign insights with "
+        f"{df.shape} shape with total column(s) "
+        f"{len(actual_cols)}/{len(required_cols)} total column including "
+        f"{len(missing_cols)} missing column(s) and "
+        f"{len(extra_cols)} extra column(s)."
+    )
+
+    if missing_cols:
+
         raise ValueError(
-            "❌ [TRANSFORM] Failed to transform TikTok Ads campaign insights due to missing columns "
-            f"{missing} then transformation will be suspended."
+            "❌ [TRANSFORM] Failed to transform validated DataFrame for TikTok Ads campaign insights due to missing required column(s) "
+            f"{sorted(missing_cols)}"
         )
 
-    # Normalize numeric metrics
+    # Parse numeric metrics
     for col in [
         "impressions", 
         "clicks", 
@@ -68,7 +82,7 @@ def transform_campaign_insights(
         
             df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
 
-    # Normalize date dimension
+    # Parse date dimension
     if "stat_time_day" in df.columns:
         
         dt = pd.to_datetime(df["stat_time_day"], errors="coerce", utc=True)
