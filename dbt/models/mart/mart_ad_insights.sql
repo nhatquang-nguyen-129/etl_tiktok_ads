@@ -43,6 +43,7 @@ select
     budget_group,
     region,
     category_level_1,
+    optimization,
     track,
     pillar,
     `group`,
