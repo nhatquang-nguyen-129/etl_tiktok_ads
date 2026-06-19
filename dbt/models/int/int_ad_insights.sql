@@ -66,6 +66,7 @@ select
     campaign.budget_group,
     campaign.region,
     campaign.category_level_1,
+    campaign.optimization,
     campaign.track,
     campaign.pillar,
     campaign.`group`,
