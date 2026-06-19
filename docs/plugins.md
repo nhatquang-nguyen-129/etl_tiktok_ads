@@ -58,7 +58,7 @@
 
 ### Create table if missing
 
-- The loader uutomatically maps pandas dtypes to Google BigQuery types with `_infer_table_schema()`
+- The loader automatically maps pandas dtypes to Google BigQuery types with `_infer_df_schema()`
 
 - The loader automatically maps pandas dtype `int` to Google BigQuery type `INT64`
 
@@ -68,9 +68,11 @@
 
 - The loader automatically maps pandas dtype `datetime` to Google BigQuery type `TIMESTAMP`
 
-- The loader automatically maps pandas dtype `others` to Google BigQuery type `STRING`
+- The loader performs additional value-based inference to detect `DATE`, `TIMESTAMP`, and numeric types from string or mixed-type columns
 
-- The loader fully supports time partitioning with `PARTITION BY DAY(date)` and clusterting
+- The loader automatically maps unsupported or unmatched types to Google BigQuery type `STRING`
+
+- The loader fully supports time partitioning with `PARTITION BY DAY(date)` and clustering configuration
 
 - After dynamically inferring the schema, the loader create new table with `_create_new_table()` if the table does not exist
 
@@ -90,9 +92,15 @@
 
 - With `UPSERT` mode, the loader removes existing records in Google BigQuery table that match the provided keys
 
+- With `UPSERT` mode, the loader skips deletion if the table does not exist or if no valid key values are found in the DataFrame
+
 - With `UPSERT` mode, the loader executes a parameterized `DELETE` query using `UNNEST(@values)` if only one key is provided
 
+- With `UPSERT` mode, the loader normalizes key values to match Google BigQuery data types before executing `DELETE` queries
+
 - With `UPSERT` mode, the loader executes a `DELETE` statement using an `EXISTS` join condition with a temporary table
+
+- With `UPSERT` mode, the loader creates and drops a temporary table to support batch deletion for multiple keys
 
 ---
 
