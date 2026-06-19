@@ -58,7 +58,7 @@ def dags_ad_insights(
         f"{end_date}..."
     )
 
-# ETL for TikTok Ads ad insights
+    # ETL for TikTok Ads ad insights
     DAGS_INSIGHTS_ATTEMPTS = 3
     
     DAGS_INSIGHTS_COOLDOWN = 60
@@ -77,7 +77,7 @@ def dags_ad_insights(
         
             try:
 
-    # Extract
+        # Extract
                 print(
                     "🔄 [DAGS] Trigger to extract TikTok Ads ad insights from advertiser_id "
                     f"{advertiser_id} with "
