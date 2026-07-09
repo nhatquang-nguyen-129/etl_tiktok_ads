@@ -86,4 +86,9 @@ def transform_ad_metadata(
         f"{len(df)} row(s)."
     )
 
+    print(
+        "✅ [TRANSFORM] Successfully transformed TikTok Ads ad metadata with "
+        f"{len(df)} row(s)."
+    )
+
     return df
