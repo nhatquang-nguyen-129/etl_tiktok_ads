@@ -68,7 +68,8 @@ def transform_ad_metadata(
         )
 
     df = df.copy()
-    
+
+    # Parse structured naming convention
     df = df.assign(
         location=lambda df: df["adgroup_name"].fillna("").str.split("|").str[0].fillna("unknown"),
         gender=lambda df: df["adgroup_name"].fillna("").str.split("|").str[1].fillna("unknown"),
@@ -80,6 +81,14 @@ def transform_ad_metadata(
         content=lambda df: df["adgroup_name"].fillna("").str.split("|").str[7].fillna("unknown"),
         type=lambda df: df["adgroup_name"].fillna("").str.split("|").str[8].fillna("unknown")
     )  
+
+    # Add columns here when they are confirmed unnecessary
+    df = df.drop(
+        columns=[
+            "create_time"
+        ],
+        errors="ignore",
+    )
 
     print(
         "✅ [TRANSFORM] Successfully transformed TikTok Ads ad metadata with "

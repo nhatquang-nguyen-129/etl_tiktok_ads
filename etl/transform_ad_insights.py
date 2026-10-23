@@ -93,9 +93,11 @@ def transform_ad_insights(
         
         df["month"] = dt.dt.strftime("%Y-%m")
 
-    # Drop raw columns
+    # Add columns here when they are confirmed unnecessary
     df = df.drop(
-        columns=["stat_time_day"],
+        columns=[
+            "stat_time_day"
+            ],
         errors="ignore"
     )
 

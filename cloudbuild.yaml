@@ -1,6 +1,6 @@
 substitutions:
   _REGION: asia-southeast1
-  _IMAGE: asia-southeast1-docker.pkg.dev/data-ads-external-report-prod/etl-tiktok-ads/v2.0.1
+  _IMAGE: asia-southeast1-docker.pkg.dev/data-ads-external-report-prod/etl-tiktok-ads/v2.0.2
 
 steps:
   - name: 'gcr.io/cloud-builders/docker'
